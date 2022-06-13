@@ -1,0 +1,24 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# zippeR
+
+[![R build status](https://github.com/chris-prener/zippeR/workflows/R-CMD-check/badge.svg)](https://github.com/chris-prener/zippeR/actions)
+[![Coverage status](https://codecov.io/gh/chris-prener/zippeR/branch/master/graph/badge.svg)](https://codecov.io/github/chris-prener/zippeR?branch=main)
+
+`zippeR` provides a set of functions for working with ZCTAs and building spatial and demographic data for three-digit ZCTAs.
+
+## Contributor Code of Conduct
+Please note that this project is released with a Contributor [Code of Conduct](/.github/CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
