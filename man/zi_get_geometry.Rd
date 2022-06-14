@@ -4,7 +4,7 @@
 \alias{zi_get_geometry}
 \title{Download and Optionally Geoprocess ZCTAs}
 \usage{
-zi_get_geometry (year, style = "zcta5", return = "GEOID",
+zi_get_geometry (year, style = "zcta5", return = "id", class = "sf",
     state = NULL, county = NULL, cb = FALSE, starts_with = NULL,
     includes = NULL, excludes = NULL, method, shift_geo = FALSE)
 }
@@ -15,11 +15,15 @@ supports data between 2010 and 2021.}
 \item{style}{A character scalar - either \code{"zcta5"} or \code{"zcta3"}.
 See Details below.}
 
-\item{return}{A character scalar; if \code{"GEOID"} (default), only the five-digit
+\item{return}{A character scalar; if \code{"id"} (default), only the five-digit
 number of each ZCTA (or three-digit if \code{style = "zcta3"}) is returned.
 This is the only valid option for  \code{style = "zcta3"}. For
 \code{style = "zcta5"}, if \code{return = "full"}, all TIGER/Line columns
 are returned.}
+
+\item{class}{A character scalar; if \code{"sf"} (default), a \code{sf} object
+suitable for mapping will be returned. If \code{"tibble"}, an object
+that omits the geometric data will be returned instead.}
 
 \item{state}{A scalar or vector with character state abbreviations
 (e.x. \code{"MO"}) or numeric FIPS codes (e.x. \code{29}). ZCTAs that
@@ -34,13 +38,14 @@ on a combination of \code{year} and \code{method}) will be returned. See
 Details below for more information. This argument is optional.}
 
 \item{cb}{A logical scalar; if \code{FALSE}, the most detailed TIGER/Line
-data will be used for \code{style = "zcta5"}. If \code{TRUE}, a
-generalized (1:500k) version of the data will be used. The generalized
-data will download significantly faster, though they show less detail.
-According to the \code{tigris::zctas()} documentation, the download size
-if \code{TRUE} is ~65MB while it is ~500MB if \code{cb = FALSE}. This
-argument does not apply to \code{style = "zcta3"}, which only returns
-generalized data.}
+    data will be used for \code{style = "zcta5"}. If \code{TRUE}, a
+    generalized (1:500k) version of the data will be used. The generalized
+    data will download significantly faster, though they show less detail.
+    According to the \code{tigris::zctas()} documentation, the download size
+    if \code{TRUE} is ~65MB while it is ~500MB if \code{cb = FALSE}.
+
+    This argument does not apply to \code{style = "zcta3"}, which only returns
+    generalized data. It also does not apply if \code{class = "tibble"}.}
 
 \item{starts_with}{A character scalar or vector containing the first two
 digits of a GEOID or ZCTA3 value to return. It defaults to \code{NULL},
@@ -63,7 +68,8 @@ See Details below.}
 \item{shift_geo}{A logical scalar; if \code{TRUE}, Alaska, Hawaii, and Puerto Rico
 will be re-positioned so that the lie to the southwest of the continental
 United States. This defaults to \code{FALSE}, and can only be used when
-states are not listed for the \code{state} argument.}
+states are not listed for the \code{state} argument. It does not apply
+if \code{class = "tibble"}.}
 }
 \value{
 A \code{sf} object with ZCTAs matching the parameters specified above

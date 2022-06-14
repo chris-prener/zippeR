@@ -7,7 +7,7 @@
 #'     argument, and the processing power of your computer (if you select
 #'     specific counties).
 #'
-#' @usage zi_get_geometry (year, style = "zcta5", return = "GEOID",
+#' @usage zi_get_geometry (year, style = "zcta5", return = "id", class = "sf",
 #'     state = NULL, county = NULL, cb = FALSE, starts_with = NULL,
 #'     includes = NULL, excludes = NULL, method, shift_geo = FALSE)
 #'
@@ -20,6 +20,9 @@
 #'     This is the only valid option for  \code{style = "zcta3"}. For
 #'     \code{style = "zcta5"}, if \code{return = "full"}, all TIGER/Line columns
 #'     are returned.
+#' @param class A character scalar; if \code{"sf"} (default), a \code{sf} object
+#'     suitable for mapping will be returned. If \code{"tibble"}, an object
+#'     that omits the geometric data will be returned instead.
 #' @param state A scalar or vector with character state abbreviations
 #'     (e.x. \code{"MO"}) or numeric FIPS codes (e.x. \code{29}). ZCTAs that
 #'     are within the given states (determined based on a combination of
@@ -35,9 +38,10 @@
 #'     generalized (1:500k) version of the data will be used. The generalized
 #'     data will download significantly faster, though they show less detail.
 #'     According to the \code{tigris::zctas()} documentation, the download size
-#'     if \code{TRUE} is ~65MB while it is ~500MB if \code{cb = FALSE}. This
-#'     argument does not apply to \code{style = "zcta3"}, which only returns
-#'     generalized data.
+#'     if \code{TRUE} is ~65MB while it is ~500MB if \code{cb = FALSE}.
+#'
+#'     This argument does not apply to \code{style = "zcta3"}, which only returns
+#'     generalized data. It also does not apply if \code{class = "tibble"}.
 #' @param starts_with A character scalar or vector containing the first two
 #'     digits of a GEOID or ZCTA3 value to return. It defaults to \code{NULL},
 #'     which will return all ZCTAs in the US. For example, supplying the argument
@@ -55,7 +59,8 @@
 #' @param shift_geo A logical scalar; if \code{TRUE}, Alaska, Hawaii, and Puerto Rico
 #'     will be re-positioned so that the lie to the southwest of the continental
 #'     United States. This defaults to \code{FALSE}, and can only be used when
-#'     states are not listed for the \code{state} argument.
+#'     states are not listed for the \code{state} argument. It does not apply
+#'     if \code{class = "tibble"}.
 #'
 #' @details This function contains options for both the type of ZCTA and,
 #'     optionally, for how state and county data are identified. For type,
@@ -88,7 +93,7 @@
 #'     county or counties).
 #'
 #' @export
-zi_get_geometry <- function(year, style = "zcta5", return = "id",
+zi_get_geometry <- function(year, style = "zcta5", return = "id", class = "sf",
                             state = NULL, county = NULL, cb = FALSE,
                             starts_with = NULL, includes = NULL, excludes = NULL,
                             method, shift_geo = FALSE){
@@ -170,9 +175,22 @@ zi_get_geometry <- function(year, style = "zcta5", return = "id",
 
   }
 
-  # shift geometry
-  if (shift_geo == TRUE){
+  # finalize output
+  if (class == "sf" & shift_geo == TRUE){
+
+    ## shift geometry
     out <- tigris::shift_geometry(out, position = "below")
+
+  }
+
+  if (class == "tibble"){
+
+    ## remove geometry
+    sf::st_geometry(out) <- NULL
+
+    ## finalize tibble
+    out <- tibble::as_tibble(out)
+
   }
 
   # return output
