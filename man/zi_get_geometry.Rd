@@ -61,7 +61,9 @@ is identified with the \code{method} argument.}
 See Details below.}
 
 \item{shift_geo}{A logical scalar; if \code{TRUE}, Alaska, Hawaii, and Puerto Rico
-will...}
+will be re-positioned so that the lie to the southwest of the continental
+United States. This defaults to \code{FALSE}, and can only be used when
+states are not listed for the \code{state} argument.}
 }
 \value{
 A \code{sf} object with ZCTAs matching the parameters specified above

@@ -53,7 +53,9 @@
 #' @param method A character scalar - either \code{"intersect"} or \code{"centroid"}.
 #'     See Details below.
 #' @param shift_geo A logical scalar; if \code{TRUE}, Alaska, Hawaii, and Puerto Rico
-#'     will...
+#'     will be re-positioned so that the lie to the southwest of the continental
+#'     United States. This defaults to \code{FALSE}, and can only be used when
+#'     states are not listed for the \code{state} argument.
 #'
 #' @details This function contains options for both the type of ZCTA and,
 #'     optionally, for how state and county data are identified. For type,
@@ -120,6 +122,10 @@ zi_get_geometry <- function(year, style = "zcta5", return = "GEOID",
     warning("The 'cb' argument does not apply to 'zcta3' data.")
   }
 
+  if (shift_geo == TRUE & is.null(state) == FALSE){
+    stop("The 'shift_geo' functionality can only be used when you are returning data for all states.")
+  }
+
   ## validate state (using tigris workflow)
   if (is.null(state) == FALSE){
     state <- unlist(sapply(state, validate_state, USE.NAMES=FALSE))
@@ -162,6 +168,11 @@ zi_get_geometry <- function(year, style = "zcta5", return = "GEOID",
                         includes = includes, excludes = excludes,
                         method = method)
 
+  }
+
+  # shift geometry
+  if (shift_geo == TRUE){
+    out <- tigris::shift_geometry(out, position = "below")
   }
 
   # return output
