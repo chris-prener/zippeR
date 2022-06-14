@@ -15,7 +15,7 @@
 #'     supports data between 2010 and 2021.
 #' @param style A character scalar - either \code{"zcta5"} or \code{"zcta3"}.
 #'     See Details below.
-#' @param return A character scalar; if \code{"GEOID"} (default), only the five-digit
+#' @param return A character scalar; if \code{"id"} (default), only the five-digit
 #'     number of each ZCTA (or three-digit if \code{style = "zcta3"}) is returned.
 #'     This is the only valid option for  \code{style = "zcta3"}. For
 #'     \code{style = "zcta5"}, if \code{return = "full"}, all TIGER/Line columns
@@ -88,7 +88,7 @@
 #'     county or counties).
 #'
 #' @export
-zi_get_geometry <- function(year, style = "zcta5", return = "GEOID",
+zi_get_geometry <- function(year, style = "zcta5", return = "id",
                             state = NULL, county = NULL, cb = FALSE,
                             starts_with = NULL, includes = NULL, excludes = NULL,
                             method, shift_geo = FALSE){
@@ -106,8 +106,8 @@ zi_get_geometry <- function(year, style = "zcta5", return = "GEOID",
     stop("The 'style' value provided is invalid. Please select either 'zcta5' or 'zcta3'.")
   }
 
-  if (return %in% c("GEOID", "full") == FALSE){
-    stop("The 'return' value provided is invalid. Please select either 'GEOID' or 'full'.")
+  if (return %in% c("id", "full") == FALSE){
+    stop("The 'return' value provided is invalid. Please select either 'id' or 'full'.")
   }
 
   if (style == "zcta3" & year %in% c(2010, 2020, 2021) == FALSE){
@@ -115,7 +115,7 @@ zi_get_geometry <- function(year, style = "zcta5", return = "GEOID",
   }
 
   if (style == "zcta3" & return == "full"){
-    warning("The 'full' option for 'return' is not available for 'zcta3' data. Please use 'GEOID' instead.")
+    warning("The 'full' option for 'return' is not available for 'zcta3' data. Please use 'id' instead.")
   }
 
   if (style == "zcta3" & cb == TRUE){
@@ -163,7 +163,7 @@ zi_get_geometry <- function(year, style = "zcta5", return = "GEOID",
 
   } else if (style == "zcta3"){
 
-    out <- zi_get_zcta3(year = year, return = return, state = state,
+    out <- zi_get_zcta3(year = year, state = state,
                         county = county, cb = cb, starts_with = starts_with,
                         includes = includes, excludes = excludes,
                         method = method)
@@ -181,7 +181,7 @@ zi_get_geometry <- function(year, style = "zcta5", return = "GEOID",
 }
 
 ## Sub Function for ZCTA5
-zi_get_zcta5 <- function(year, return = "GEOID", state, county, cb, starts_with,
+zi_get_zcta5 <- function(year, return = "id", state, county, cb, starts_with,
                          includes, excludes, method){
 
   # global variables
@@ -258,7 +258,7 @@ zi_get_zcta5 <- function(year, return = "GEOID", state, county, cb, starts_with,
   }
 
   # subset columns based on return
-  if (return == "GEOID"){
+  if (return == "id"){
     if (year < 2020){
       out <- dplyr::select(out, GEOID10)
     } else if (year >= 2020){
@@ -316,7 +316,7 @@ zi_process_county <- function(cb, state, county, year, zcta, method, style){
 }
 
 ## Sub Function for ZCTA3
-zi_get_zcta3 <- function(year, return = "GEOID", state, county, cb, starts_with,
+zi_get_zcta3 <- function(year, state, county, cb, starts_with,
                          includes, excludes, method){
 
   # global variables
