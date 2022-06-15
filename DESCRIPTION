@@ -1,10 +1,9 @@
 Package: zippeR
-Title: Measures of Deprivation
+Title: Working with United States ZIP Code and ZCTA Data
 Version: 0.1.0.9000
 Authors@R: c(
     person("Christopher", "Prener", ,"chris.prener@gmail.com", c("aut", "cre"),
-    comment = c(ORCID = "0000-0002-4310-9888")),
-    person("Timothy", "Wiemken", , role = "aut")
+    comment = c(ORCID = "0000-0002-4310-9888"))
     )
 Description: Provides a set of functions for working with ZCTAs and building
     spatial and demographic data for three-digit ZCTAs.
@@ -19,6 +18,7 @@ Imports:
     dplyr,
     measurements,
     sf,
+    spatstat.geom,
     stringr,
     tibble,
     tidycensus,

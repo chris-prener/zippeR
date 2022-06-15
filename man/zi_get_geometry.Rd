@@ -72,9 +72,9 @@ states are not listed for the \code{state} argument. It does not apply
 if \code{class = "tibble"}.}
 }
 \value{
-A \code{sf} object with ZCTAs matching the parameters specified above
-    (either a nationwide file, a specific state or states, or a specific
-    county or counties).
+A \code{sf} object with ZCTAs matching the parameters specified above:
+    either a nationwide file, a specific state or states, or a specific
+    county or counties.
 }
 \description{
 This function returns geometric data for ZIP Code Tabulation

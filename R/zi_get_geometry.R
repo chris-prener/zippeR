@@ -88,9 +88,9 @@
 #'     will be used as a base before identifying ZCTAs within counties using
 #'     either the \code{"intersect"} or \code{"centroid"} method described above.
 #'
-#' @return A \code{sf} object with ZCTAs matching the parameters specified above
-#'     (either a nationwide file, a specific state or states, or a specific
-#'     county or counties).
+#' @return A \code{sf} object with ZCTAs matching the parameters specified above:
+#'     either a nationwide file, a specific state or states, or a specific
+#'     county or counties.
 #'
 #' @export
 zi_get_geometry <- function(year, style = "zcta5", return = "id", class = "sf",
@@ -115,7 +115,7 @@ zi_get_geometry <- function(year, style = "zcta5", return = "id", class = "sf",
     stop("The 'return' value provided is invalid. Please select either 'id' or 'full'.")
   }
 
-  if (style == "zcta3" & year %in% c(2010, 2020, 2021) == FALSE){
+  if (style == "zcta3" & year %in% c(2010, 2011, 2012, 2020, 2021) == FALSE){
     stop(paste0("ZCTA3 data for ", year, " are not yet available."))
   }
 
@@ -203,15 +203,10 @@ zi_get_zcta5 <- function(year, return = "id", state, county, cb, starts_with,
                          includes, excludes, method){
 
   # global variables
-  GEOID10 = GEOID20 = NULL
+  GEOID10 = GEOID20 = GEOID = NULL
 
   # download geometry
-  if (is.null(state) == FALSE & year == 2010){
-
-    ## tigris call
-    out <- tigris::zctas(year = 2010, state = state, cb = cb)
-
-  } else if (is.null(state) == FALSE & is.null(county) == TRUE) {
+  if (is.null(state) == FALSE & is.null(county) == TRUE) {
 
     ## tigris call
     out <- tigris::zctas(year = year, cb = cb)
@@ -223,12 +218,15 @@ zi_get_zcta5 <- function(year, return = "id", state, county, cb, starts_with,
     zcta_vec <- unique(c(zcta_vec, includes))
     zcta_vec <- zcta_vec[zcta_vec %in% excludes == FALSE]
 
-    ## subset based on year
+    ## rename year
     if (year < 2020){
-      out <- dplyr::filter(out, GEOID10 %in% zcta_vec == TRUE)
+      out <- dplyr::rename(out, GEOID = GEOID10)
     } else if (year >= 2020){
-      out <- dplyr::filter(out, GEOID20 %in% zcta_vec == TRUE)
+      out <- dplyr::rename(out, GEOID = GEOID20)
     }
+
+    ## subset
+    out <- dplyr::filter(out, GEOID %in% zcta_vec == TRUE)
 
   } else if (is.null(state) == FALSE & is.null(county) == FALSE){
 
@@ -244,45 +242,46 @@ zi_get_zcta5 <- function(year, return = "id", state, county, cb, starts_with,
     zcta_vec <- unique(c(zcta_vec, includes))
     zcta_vec <- zcta_vec[zcta_vec %in% excludes == FALSE]
 
-    ## subset based on year
+    ## rename year
     if (year < 2020){
-      out <- dplyr::filter(out, GEOID10 %in% zcta_vec == TRUE)
+      out <- dplyr::rename(out, GEOID = GEOID10)
     } else if (year >= 2020){
-      out <- dplyr::filter(out, GEOID20 %in% zcta_vec == TRUE)
+      out <- dplyr::rename(out, GEOID = GEOID20)
     }
+
+    ## subset
+    out <- dplyr::filter(out, GEOID %in% zcta_vec == TRUE)
 
   } else if (is.null(state) == TRUE & is.null(county) == TRUE){
 
     ## tigirs call
     out <- tigris::zctas(year = year, cb = cb)
 
-    ## subset based on year
+    ## rename year
+    if (year < 2020){
+      out <- dplyr::rename(out, GEOID = GEOID10)
+    } else if (year >= 2020){
+      out <- dplyr::rename(out, GEOID = GEOID20)
+    }
+
+    ## subset
     if (is.null(excludes) == FALSE){
-      if (year < 2020){
-        out <- dplyr::filter(out, GEOID10 %in% excludes == FALSE)
-      } else if (year >= 2020){
-        out <- dplyr::filter(out, GEOID20 %in% excludes == FALSE)
-      }
+      out <- dplyr::filter(out, GEOID %in% zcta_vec == TRUE)
     }
   }
 
   # subset based on starts with
   if (is.null(starts_with) == FALSE){
-    if (year < 2020){
-      out <- dplyr::filter(out, substr(GEOID10, 1, 2) %in% starts_with == TRUE)
-    } else if (year >= 2020){
-      out <- dplyr::filter(out, substr(GEOID20, 1, 2) %in% starts_with == TRUE)
-    }
+    out <- dplyr::filter(out, substr(GEOID, 1, 2) %in% starts_with == TRUE)
   }
 
   # subset columns based on return
   if (return == "id"){
-    if (year < 2020){
-      out <- dplyr::select(out, GEOID10)
-    } else if (year >= 2020){
-      out <- dplyr::select(out, GEOID20)
-    }
+    out <- dplyr::select(out, GEOID)
   }
+
+  # order output
+  out <- dplyr::arrange(out, GEOID)
 
   # return output
   return(out)
@@ -396,6 +395,9 @@ zi_get_zcta3 <- function(year, state, county, cb, starts_with,
   if (is.null(starts_with) == FALSE){
     out <- dplyr::filter(out, substr(ZCTA3, 1, 2) %in% starts_with == TRUE)
   }
+
+  # order output
+  out <- dplyr::arrange(out, ZCTA3)
 
   # return output
   return(out)
