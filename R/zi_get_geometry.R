@@ -135,7 +135,6 @@ zi_get_geometry <- function(year, style = "zcta5", return = "id", class = "sf",
     stop("The 'shift_geo' functionality can only be used when you are returning data for all states.")
   }
 
-  ## validate state (using tigris workflow)
   if (is.null(state) == FALSE){
     state <- unlist(sapply(state, validate_state, USE.NAMES=FALSE))
   }
@@ -154,14 +153,15 @@ zi_get_geometry <- function(year, style = "zcta5", return = "id", class = "sf",
     }
   }
 
-  ## check year
-  if (year == 2011){
-    year <- 2010
+  ## validate counties
+
+  if (is.null(starts_with) == FALSE){
+    valid <- zi_validate_starts(starts_with)
+
+    if (valid == FALSE){
+      stop("ZCTA data passed to the 'starts_with' argument are invalid. Please use a character vector with only two-digit values.")
+    }
   }
-
-  # validate counties
-
-  # validate states with
 
   if (is.null(includes) == FALSE){
     valid <- zi_validate(includes, style = style)
@@ -179,6 +179,10 @@ zi_get_geometry <- function(year, style = "zcta5", return = "id", class = "sf",
     }
   }
 
+  # check year
+  if (year == 2011){
+    year <- 2010
+  }
 
   # call sub functions
   if (style == "zcta5"){
@@ -427,5 +431,38 @@ zi_get_zcta3 <- function(year, state, county, cb, starts_with,
 }
 
 # validate starts with
+zi_validate_starts <- function(x){
 
+  # ensure character
+  if (is.character(x) == FALSE){
+    chr_out <- FALSE
+  } else {
+    chr_out <- TRUE
+  }
+
+  # ensure length and padding
+  chr_len <- unique(nchar(x))
+  chr_len <- chr_len[!is.na(chr_len)]
+
+  # inputs are too long
+  if (max(chr_len, na.rm = TRUE) > 2){
+    len_out1 <- FALSE
+  } else {
+    len_out1 <- TRUE
+  }
+
+  # inputs are too short
+  if (max(chr_len, na.rm = TRUE) < 2){
+    len_out2 <- FALSE
+  } else {
+    len_out2 <- TRUE
+  }
+
+  # result
+  out <- all(chr_out, len_out1, len_out2)
+
+  # return result
+  return(out)
+
+}
 

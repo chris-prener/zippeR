@@ -1,5 +1,9 @@
-# Validate State
-# From tigris but not exported
+# these are all functions from the tigris package that are not exported
+# https://github.com/walkerke/tigris/blob/master/R/utils.R
+# used based on terms of the MIT License used by the package's author, Kyle Walker
+# https://github.com/walkerke/tigris/blob/master/DESCRIPTION
+
+# validate state
 validate_state <- function(state, .msg=interactive()) {
 
   # global variables
@@ -62,4 +66,10 @@ validate_state <- function(state, .msg=interactive()) {
 
 }
 
+# Capitalization
+simpleCapSO <- function(x) {
+  s <- strsplit(x, " ")[[1]]
+  paste(toupper(substring(s, 1,1)), substring(s, 2),
+        sep="", collapse=" ")
+}
 

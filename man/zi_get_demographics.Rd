@@ -37,10 +37,8 @@ strongly encouraged format.}
 \item{zcta}{An optional vector of ZCTAs that demographic data are requested
 for. If this is \code{NULL}, data will be returned for all ZCTAs. If a
 vector is supplied, only data for those requested ZCTAs will be returned.
-The vector can be created with \code{zi_get_geometry()}. If
-\code{style = "zcta5"}, this vector should be made up of five-digit
-\code{GEOID} values. If \code{style = "zcta3"}, this vector should be
-made up of three-digital \code{ZCTA3} values.}
+The vector can be created with \code{zi_get_geometry()} and should only
+contain five-digit ZCTAs.}
 
 \item{key}{A Census API key, which can be obtained at
 \url{https://api.census.gov/data/key_signup.html}. This can be omitted if
