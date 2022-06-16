@@ -63,8 +63,145 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-Provides a set of functions for working with ZCTAs and building
-    spatial and demographic data for three-digit ZCTAs.
+<div class="section level1">
+<div class="page-header"><h1 id="zipper">zippeR<a class="anchor" aria-label="anchor" href="#zipper"></a>
+</h1></div>
+
+<div class="section level2">
+<h2 id="motivation">Motivation<a class="anchor" aria-label="anchor" href="#motivation"></a>
+</h2>
+<p><code>zippeR</code> provides a set of functions for working with ZCTAs and building spatial and demographic data for three-digit ZCTAs. These three-digit ZCTAs have limitations (they are large regions), but they are also used within American health care to protect patient confidentiality. <code>zippeR</code> therefore offers researchers who must use three-digit ZCTAs the capability to download geometric data and also aggregate demographic data from five-digit ZCTAs to three-digit ZCTAs. In addition, <code>zippeR</code> includes functions for validating and formatting vectors of ZIP Codes or ZCTAs as well as tools for crosswalking ZIP codes with ZCTAs.</p>
+</div>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<div class="section level3">
+<h3 id="installing-zipper">Installing zippeR<a class="anchor" aria-label="anchor" href="#installing-zipper"></a>
+</h3>
+<p>The development version of <code>zippeR</code> can be accessed from GitHub with <code>remotes</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># install.packages("remotes")</span>
+<span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"chris-prener/zippeR"</span><span class="op">)</span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
+</h2>
+<div class="section level3">
+<h3 id="zip-code-and-zcta-formatting">ZIP Code and ZCTA Formatting<a class="anchor" aria-label="anchor" href="#zip-code-and-zcta-formatting"></a>
+</h3>
+<p>One of the core features of <code>zippeR</code> validate inputs of ZIP codes or ZCTA codes. For example, here are a set of ZCTAs that lie on the Missouri/Iowa border:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">zcta5</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"51640"</span>, <span class="st">"52542"</span>, <span class="st">"52573"</span>, <span class="st">"5262x"</span><span class="op">)</span></code></pre></div>
+<p>Notice how the last element contains a non-numeric character. When <code>zcta5</code> is passed to <code><a href="reference/zi_validate.html">zi_validate()</a></code>, it will catch the formatting issue. There are two options, one of which returns a single logical value (<code>TRUE</code> or <code>FALSE</code>):</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">library</span>(zippeR)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">zi_validate</span>(zcta5)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="cn">FALSE</span></span></code></pre></div>
+<p>The other option, with <code>verbose = TRUE</code>, provides additional data about where formatting issues may exist:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">zi_validate</span>(zcta5, <span class="at">verbose =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># A tibble: 4 × 2</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  condition                                   result</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="sc">&lt;</span>chr<span class="sc">&gt;</span>                                       <span class="er">&lt;</span>lgl<span class="sc">&gt;</span> </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> Input is a character vector?                <span class="cn">TRUE</span>  </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span> All input values have <span class="dv">5</span> characters?         <span class="cn">TRUE</span>  </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span> No input values are over <span class="dv">5</span> characters long? <span class="cn">TRUE</span>  </span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span> All input values are numeric?               <span class="cn">FALSE</span> </span></code></pre></div>
+<p>For the third and fourth tests, users are strongly encourage to attempt to manually correct problems. However, <code><a href="reference/zi_repair.html">zi_repair()</a></code> can be used to address the first and second tests, and will return <code>NA</code> values for ZIPs or ZCTAs that do not pass the third and fourth tests:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">zi_repair</span>(zcta5)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="st">"51640"</span> <span class="st">"52542"</span> <span class="st">"52573"</span> <span class="cn">NA</span>     </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>Warning message<span class="sc">:</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>In <span class="fu">zi_repair</span>(zcta5) <span class="sc">:</span> NAs introduced by coercion</span></code></pre></div>
+<p>When malformed ZIPs or ZCTAs are replaced with <code>NA</code> values, <code><a href="reference/zi_repair.html">zi_repair()</a></code> will return a warning. Note that <code><a href="reference/zi_validate.html">zi_validate()</a></code> also works with three-digit ZCTAs as well:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> zcta3 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"516"</span>, <span class="st">"525"</span>, <span class="st">"526"</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">zi_validate</span>(zcta3, <span class="at">style =</span> <span class="st">"zcta3"</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="cn">TRUE</span></span></code></pre></div>
+<p>Note that, at this time, the validation process does not ensure that inputs correspond to valid ZCTAs. That functionality is planned for addition prior to release.</p>
+</div>
+<div class="section level3">
+<h3 id="zcta-geometry">ZCTA Geometry<a class="anchor" aria-label="anchor" href="#zcta-geometry"></a>
+</h3>
+<p><code>zippeR</code> providers support for downloading geometric data as <code>sf</code> objects. For five-digit ZCTAs, <code>tigris</code> is used to access the TIGER/Line database. For three-digit ZCTAs, these are downloaded from <a href="https://github.com/chris-prener/zcta3" class="external-link">a repository on GitHub</a> maintained by the author. These are generalized versions of the ZCTA geometry designed to provide a smaller file size suitable for storage on GitHub. Nevertheless, each file is still approximately 60MB in size. Users should carefully evaluate the geometric data to ensure they are fit for purpose, and note that these are provided without warrenty.</p>
+<p>One major difference between <code><a href="https://rdrr.io/pkg/tigris/man/zctas.html" class="external-link">tigris::zctas()</a></code> and <code>zipper::get_geometry()</code> is that <code>zippeR</code> provides support for automatically returning ZCTAs that intersect or whose centroids lie within states and/or counties. This can be used with both the five- and three-digit ZCTAs. In general, the intersect method will yield more ZCTAs than are necessary while the centroid method will yield too few. For example, for Missouri, we need to use the <code>includes</code> argument to add several additional ZCTAs in whose centroids do not fall within Missouri itself (they all lie in Iowa):</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">geo12</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/zi_get_geometry.html">zi_get_geometry</a></span><span class="op">(</span>year <span class="op">=</span> <span class="fl">2012</span>, state <span class="op">=</span> <span class="st">"MO"</span>, method <span class="op">=</span> <span class="st">"centroid"</span>, 
+    includes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"51640"</span>, <span class="st">"52542"</span>, <span class="st">"52573"</span>, <span class="st">"52626"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p>The same process can be used for three-digit ZCTAs, though note that only three-digit areas are passed to the <code>includes</code> argument:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">geo12_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/zi_get_geometry.html">zi_get_geometry</a></span><span class="op">(</span>year <span class="op">=</span> <span class="fl">2012</span>, style <span class="op">=</span> <span class="st">"zcta3"</span>, state <span class="op">=</span> <span class="st">"MO"</span>, method <span class="op">=</span> <span class="st">"centroid"</span>,
+                           includes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"516"</span>, <span class="st">"525"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p>If you use the intersect method, the corresponding <code>excludes</code> argument can be used to drop ZCTAs that are not needed. Note that all ZCTAs passed to <code>starts_with</code> (which accepts two-digit values), <code>includes</code>, and <code>excludes</code> are validated to ensure they follow formatting requirements. As noted above, the validation process does not ensure that inputs correspond to valid ZCTAs at this time.</p>
+<p>One additional option to note is that, when downloading nation-wide ZCTA data, you can use the <code>shift_geo</code> argument to place Alaska, Hawaii, and Puerto Rico in the lower left-hand corner of your map:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">geo10</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/zi_get_geometry.html">zi_get_geometry</a></span><span class="op">(</span>year <span class="op">=</span> <span class="fl">2010</span>, shift_geo <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="zcta-demographics">ZCTA Demographics<a class="anchor" aria-label="anchor" href="#zcta-demographics"></a>
+</h3>
+<p>Downloading the geometric data can be used for mapping, or simply to produce a vector of all five- or three-digit ZCTAs in a given area. These, in-turn, can be used to define areas where demographic data are desired. The <code><a href="reference/zi_get_demographics.html">zi_get_demographics()</a></code> wraps <code>tidycensus</code> functions to get data using a single, uniform API. For instance, we can download the total population for all ZCTAs based on the 2010 Decennial Census:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">pop10</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/zi_get_demographics.html">zi_get_demographics</a></span><span class="op">(</span>year <span class="op">=</span> <span class="fl">2010</span>, variables <span class="op">=</span> <span class="st">"P001001"</span>, survey <span class="op">=</span> <span class="st">"sf1"</span><span class="op">)</span></code></pre></div>
+<p><em>Note: As of now, the Census Bureau has not released ZCTA data for the 2020 Decennial Census.</em></p>
+<p>If you are working with output from <code><a href="reference/zi_get_geometry.html">zi_get_geometry()</a></code>, you can specify the <code>GEOID</code> vector in your call to limit the number of ZCTAs returned:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">gini12</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/zi_get_demographics.html">zi_get_demographics</a></span><span class="op">(</span>year <span class="op">=</span> <span class="fl">2012</span>, table <span class="op">=</span> <span class="st">"B19083"</span>, survey <span class="op">=</span> <span class="st">"acs5"</span>, zcta <span class="op">=</span> <span class="va">geo12</span><span class="op">$</span><span class="va">GEOID</span><span class="op">)</span></code></pre></div>
+<p><em>This should only be used for five-digit ZCTAs.</em> If you are working with three-digit ZCTAs, you must aggregate your data first to ensure that the numbers generated reflect the entirety of the three-digit ZCTA. Aggregation is accomplished with <code><a href="reference/zi_aggregate.html">zi_aggregate()</a></code>. First, we’ll download some data <em>without</em> specifying any input for the <code>zcta</code> argument:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">pop12</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/zi_get_demographics.html">zi_get_demographics</a></span><span class="op">(</span>year <span class="op">=</span> <span class="fl">2012</span>, variables <span class="op">=</span> <span class="st">"B01003_001"</span>, survey <span class="op">=</span> <span class="st">"acs5"</span><span class="op">)</span></code></pre></div>
+<p>Once these are obtained, we can pass the object to <code><a href="reference/zi_aggregate.html">zi_aggregate()</a></code> and can specify an input for <code>zcta</code> at this stage:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">pop12_mo3</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/zi_aggregate.html">zi_aggregate</a></span><span class="op">(</span><span class="va">pop12</span>, year <span class="op">=</span> <span class="fl">2012</span>, extensive <span class="op">=</span> <span class="st">"B01003_001"</span>, survey <span class="op">=</span> <span class="st">"acs5"</span>, zcta <span class="op">=</span> <span class="va">geo12_3</span><span class="op">$</span><span class="va">ZCTA3</span><span class="op">)</span></code></pre></div>
+<p>The <code><a href="reference/zi_aggregate.html">zi_aggregate()</a></code> function requires that you specify two sets of variable lists - those that are <code>extensive</code> (i.e. count data) and those that are <code>intensive</code> (i.e. ratio or median data). For <code>extensive</code> data, <code><a href="reference/zi_aggregate.html">zi_aggregate()</a></code> sums the estimates and applies a formula to the margins of error (the square root of the sum of squared margins of error for each five-digit ZCTA within a three-digit region). For <code>intensive</code> variables, a weighted mean or median is used for both the estimate and the margin of error. Note that you can pipe this workflow and can specify multiple variables at once for aggregation:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="reference/zi_get_demographics.html">zi_get_demographics</a></span><span class="op">(</span>year <span class="op">=</span> <span class="fl">2020</span>, variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"B01003_001"</span>, <span class="st">"B19083_001"</span><span class="op">)</span>, survey <span class="op">=</span> <span class="st">"acs5"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="reference/zi_aggregate.html">zi_aggregate</a></span><span class="op">(</span>year <span class="op">=</span> <span class="fl">2020</span>, extensive <span class="op">=</span> <span class="st">"B01003_001"</span>, intensive <span class="op">=</span> <span class="st">"B19083_001"</span>, survey <span class="op">=</span> <span class="st">"acs5"</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">demo20</span></code></pre></div>
+<p>The <code>variables</code>, <code>table</code> (which can be used in place of <code>variables</code> for <code><a href="reference/zi_get_demographics.html">zi_get_demographics()</a></code>), <code>extensive</code>, and <code>intensive</code> arguments are not validated before being passed via <code>tidycensus</code> to the Census Bureau, so mis-formatted variable or table names will generate potentially cryptic errors.</p>
+</div>
+<div class="section level3">
+<h3 id="zip-code-to-zcta-crosswalks">ZIP Code to ZCTA Crosswalks<a class="anchor" aria-label="anchor" href="#zip-code-to-zcta-crosswalks"></a>
+</h3>
+<p>Finally, <code>zippeR</code> provides an interface for accessing the <a href="https://udsmapper.org/zip-code-to-zcta-crosswalk/" class="external-link">UDS Mapper ZIP to ZCTA crosswalk files</a>. Crosswalk files are critical because not all ZIP codes are in the exact same ZCTA. For example, the first two entries below have very different ZCTAs. The UDS files are available from 2010 through 2021 in a standardized format:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">zi_load_crosswalk</span>(<span class="at">year =</span> <span class="dv">2020</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># A tibble: 41,096 × 6                                                                                                                                                                                 </span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>   ZIP   PO_NAME    STATE ZIP_TYPE                             ZCTA  zip_join_type       </span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>   <span class="sc">&lt;</span>chr<span class="sc">&gt;</span> <span class="er">&lt;</span>chr<span class="sc">&gt;</span>      <span class="er">&lt;</span>chr<span class="sc">&gt;</span> <span class="er">&lt;</span>chr<span class="sc">&gt;</span>                                <span class="er">&lt;</span>chr<span class="sc">&gt;</span> <span class="er">&lt;</span>chr<span class="sc">&gt;</span>               </span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a> <span class="dv">1</span> <span class="dv">00501</span> Holtsville NY    Post Office or large volume customer <span class="dv">11742</span> Spatial join to ZCTA</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a> <span class="dv">2</span> <span class="dv">00544</span> Holtsville NY    Post Office or large volume customer <span class="dv">11742</span> Spatial join to ZCTA</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a> <span class="dv">3</span> <span class="dv">00601</span> Adjuntas   PR    ZIP Code Area                        <span class="dv">00601</span> ZIP Matches ZCTA    </span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a> <span class="dv">4</span> <span class="dv">00602</span> Aguada     PR    ZIP Code Area                        <span class="dv">00602</span> ZIP Matches ZCTA    </span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a> <span class="dv">5</span> <span class="dv">00603</span> Aguadilla  PR    ZIP Code Area                        <span class="dv">00603</span> ZIP Matches ZCTA    </span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a> <span class="dv">6</span> <span class="dv">00604</span> Aguadilla  PR    Post Office or large volume customer <span class="dv">00603</span> Spatial join to ZCTA</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a> <span class="dv">7</span> <span class="dv">00605</span> Aguadilla  PR    Post Office or large volume customer <span class="dv">00603</span> Spatial join to ZCTA</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a> <span class="dv">8</span> <span class="dv">00606</span> Maricao    PR    ZIP Code Area                        <span class="dv">00606</span> ZIP Matches ZCTA    </span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a> <span class="dv">9</span> <span class="dv">00610</span> Anasco     PR    ZIP Code Area                        <span class="dv">00610</span> ZIP Matches ZCTA    </span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span> <span class="dv">00611</span> Angeles    PR    Post Office or large volume customer <span class="dv">00641</span> Spatial join to ZCTA</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="co"># … with 41,086 more rows</span></span></code></pre></div>
+<p>As with the three-digit ZCTA geometry, users should evaluate these data carefully before using them to ensure they are fit for purpose. In particular, they should note that ZIPs that do not have corresponding ZCTAs (such as Armed Forces mailing ZIPs and those in some overseas territories) are not included. Users should also remember that individuals may live in a different ZCTA from their mailing address when that address is a Post Office or some other large volume customer.</p>
+<p>They can be used with <code><a href="reference/zi_crosswalk.html">zi_crosswalk()</a></code> to convert given ZIP codes to ZCTAs:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> zips <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">id =</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>), <span class="at">ZIP =</span> <span class="fu">c</span>(<span class="st">"63139"</span>, <span class="st">"63108"</span>, <span class="st">"00501"</span>))</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">zi_crosswalk</span>(zips, <span class="at">input_zip =</span> ZIP, <span class="at">dict =</span> <span class="st">"UDS 2021"</span>) </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># A tibble: 3 × 3                                                                                                                                                                                      </span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>     id ZIP   ZCTA </span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="sc">&lt;</span>int<span class="sc">&gt;</span> <span class="er">&lt;</span>chr<span class="sc">&gt;</span> <span class="er">&lt;</span>chr<span class="sc">&gt;</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>     <span class="dv">1</span> <span class="dv">63139</span> <span class="dv">63139</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>     <span class="dv">2</span> <span class="dv">63108</span> <span class="dv">63108</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>     <span class="dv">3</span> <span class="dv">00501</span> <span class="dv">11742</span></span></code></pre></div>
+<p>If <code>"UDS 2021"</code> (or any other year between 2010 and 2021) is given for <code>dict</code>, <code><a href="reference/zi_crosswalk.html">zi_crosswalk()</a></code> will automatically download the UDS crosswalk file. A custom crosswalk can also be supplied for <code>dict</code> in lieu of using the UDS data. In that case, <code>dict_zip</code> and <code>dict_zcta</code> should be updated to correctly match input variable names. <code>style</code> can also be used if the custom dictionary contains three digit ZCTAs instead. If no custom dictionary is supplied, <code><a href="reference/zi_crosswalk.html">zi_crosswalk()</a></code> will try to conver the dictionary’s five-digit ZCTAs to three-digits:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">zi_crosswalk</span>(zips, <span class="at">input_zip =</span> ZIP, <span class="at">dict =</span> <span class="st">"UDS 2021"</span>, <span class="at">style =</span> <span class="st">"zcta3"</span>) </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>Dictionary five<span class="sc">-</span>digit ZCTAs converted to three<span class="sc">-</span>digit ZCTAs.                                                                                                                                            </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co"># A tibble: 3 × 3</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>     id ZIP   ZCTA3</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="sc">&lt;</span>int<span class="sc">&gt;</span> <span class="er">&lt;</span>chr<span class="sc">&gt;</span> <span class="er">&lt;</span>chr<span class="sc">&gt;</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>     <span class="dv">1</span> <span class="dv">63139</span> <span class="dv">631</span>  </span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>     <span class="dv">2</span> <span class="dv">63108</span> <span class="dv">631</span>  </span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>     <span class="dv">3</span> <span class="dv">00501</span> <span class="dv">117</span>  </span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="contributor-code-of-conduct">Contributor Code of Conduct<a class="anchor" aria-label="anchor" href="#contributor-code-of-conduct"></a>
+</h2>
+<p>Please note that this project is released with a Contributor <a href="/CODE_OF_CONDUCT.html">Code of Conduct</a>. By participating in this project you agree to abide by its terms.</p>
+</div>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -106,7 +243,13 @@ Provides a set of functions for working with ZCTAs and building
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/chris-prener/zippeR/actions" class="external-link"><img src="https://github.com/chris-prener/zippeR/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
+<li><a href="https://codecov.io/github/chris-prener/zippeR?branch=main" class="external-link"><img src="https://codecov.io/gh/chris-prener/zippeR/branch/master/graph/badge.svg" alt="Coverage status"></a></li>
+</ul>
+</div>
 
   </div>
 </div>

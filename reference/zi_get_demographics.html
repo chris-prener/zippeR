@@ -100,10 +100,8 @@ strongly encouraged format.</p></dd>
 <dd><p>An optional vector of ZCTAs that demographic data are requested
 for. If this is <code>NULL</code>, data will be returned for all ZCTAs. If a
 vector is supplied, only data for those requested ZCTAs will be returned.
-The vector can be created with <code><a href="zi_get_geometry.html">zi_get_geometry()</a></code>. If
-<code>style = "zcta5"</code>, this vector should be made up of five-digit
-<code>GEOID</code> values. If <code>style = "zcta3"</code>, this vector should be
-made up of three-digital <code>ZCTA3</code> values.</p></dd>
+The vector can be created with <code><a href="zi_get_geometry.html">zi_get_geometry()</a></code> and should only
+contain five-digit ZCTAs.</p></dd>
 
 
 <dt>key</dt>

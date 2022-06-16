@@ -25,6 +25,9 @@
     <loc>https://chris-prener.github.io/zippeR/reference/zi_aggregate.html</loc>
   </url>
   <url>
+    <loc>https://chris-prener.github.io/zippeR/reference/zi_crosswalk.html</loc>
+  </url>
+  <url>
     <loc>https://chris-prener.github.io/zippeR/reference/zi_get_demographics.html</loc>
   </url>
   <url>
@@ -32,5 +35,14 @@
   </url>
   <url>
     <loc>https://chris-prener.github.io/zippeR/reference/zi_list_zctas.html</loc>
+  </url>
+  <url>
+    <loc>https://chris-prener.github.io/zippeR/reference/zi_load_crosswalk.html</loc>
+  </url>
+  <url>
+    <loc>https://chris-prener.github.io/zippeR/reference/zi_repair.html</loc>
+  </url>
+  <url>
+    <loc>https://chris-prener.github.io/zippeR/reference/zi_validate.html</loc>
   </url>
 </urlset>
