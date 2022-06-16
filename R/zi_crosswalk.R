@@ -88,8 +88,24 @@ zi_crosswalk <- function(.data, input_zip, dict = "UDS 2021", dict_zip = "ZIP",
 
   valid <- zi_validate(dict[[dict_zctaQN]], style = style)
 
-  if (valid == FALSE){
+  if (valid == FALSE & style == "zcta5"){
     stop(paste0("Dictionary ZCTA data in the '", dict_zctaQN, "' column are invalid. Please use 'zi_validate()' with the 'verbose = TRUE' option to investgiate further. The 'zi_repair()' function may be used to address isses."))
+  }
+
+  if (valid == FALSE & style == "zcta3"){
+
+    dict[[dict_zctaQN]] <- substr(dict[[dict_zctaQN]], 1, 3)
+
+    valid <- zi_validate(dict[[dict_zctaQN]], style = style)
+
+    if (valid == FALSE){
+      stop(paste0("Dictionary ZCTA data in the '", dict_zctaQN, "' column are invalid. Please use 'zi_validate()' with the 'verbose = TRUE' option to investgiate further. The 'zi_repair()' function may be used to address isses."))
+    } else if (valid == TRUE){
+      message("Dictionary five-digit ZCTAs converted to three-digit ZCTAs.")
+      dict <- dplyr::rename(dict, "ZCTA3" = dict_zctaQN)
+      dict_zctaQN <- "ZCTA3"
+    }
+
   }
 
   # subset dictionary
