@@ -31,10 +31,8 @@
 #' @param zcta An optional vector of ZCTAs that demographic data are requested
 #'     for. If this is \code{NULL}, data will be returned for all ZCTAs. If a
 #'     vector is supplied, only data for those requested ZCTAs will be returned.
-#'     The vector can be created with \code{zi_get_geometry()}. If
-#'     \code{style = "zcta5"}, this vector should be made up of five-digit
-#'     \code{GEOID} values. If \code{style = "zcta3"}, this vector should be
-#'     made up of three-digital \code{ZCTA3} values.
+#'     The vector can be created with \code{zi_get_geometry()} and should only
+#'     contain five-digit ZCTAs.
 #' @param key A Census API key, which can be obtained at
 #'     \url{https://api.census.gov/data/key_signup.html}. This can be omitted if
 #'     \code{tidycensus::census_api_key()} has been used to write your key to
@@ -90,7 +88,13 @@ zi_get_demographics <- function(year, variables = NULL,
     stop("The 'output' requested is invalid. Please choose one of 'tidy' or 'wide'.")
   }
 
-  # validate ZCTAs
+  if (is.null(zcta) == FALSE){
+    valid <- zi_validate(zcta)
+
+    if (valid == FALSE){
+      stop("ZCTA data passed to the 'zcta' argument are invalid. Please use 'zi_validate()' with the 'verbose = TRUE' option to investgiate further. The 'zi_repair()' function may be used to address isses.")
+    }
+  }
 
   # set additional arguments
   ## debugging to pass to tidycensus

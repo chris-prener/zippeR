@@ -116,6 +116,14 @@ zi_aggregate <- function(.data, year, extensive = NULL, intensive = NULL,
     }
   }
 
+  if (is.null(zcta) == FALSE){
+    valid <- zi_validate(zcta, style = "zcta3")
+
+    if (valid == FALSE){
+      stop("ZCTA data passed to the 'zcta' argument are invalid. Please use 'zi_validate()' with the 'verbose = TRUE' option to investgiate further. The 'zi_repair()' function may be used to address isses.")
+    }
+  }
+
   # set additional arguments
   ## call type
   if (is.null(extensive) == FALSE){

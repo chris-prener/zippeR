@@ -127,6 +127,10 @@ zi_get_geometry <- function(year, style = "zcta5", return = "id", class = "sf",
     warning("The 'cb' argument does not apply to 'zcta3' data.")
   }
 
+  if (is.logical(shift_geo) == FALSE){
+    stop("The 'shift_geo' value provided is invalid. Please select either 'TRUE' or 'FALSE'.")
+  }
+
   if (shift_geo == TRUE & is.null(state) == FALSE){
     stop("The 'shift_geo' functionality can only be used when you are returning data for all states.")
   }
@@ -155,8 +159,26 @@ zi_get_geometry <- function(year, style = "zcta5", return = "id", class = "sf",
     year <- 2010
   }
 
-  # includes and excludes vectors
   # validate counties
+
+  # validate states with
+
+  if (is.null(includes) == FALSE){
+    valid <- zi_validate(includes, style = style)
+
+    if (valid == FALSE){
+      stop("ZCTA data passed to the 'includes' argument are invalid. Please use 'zi_validate()' with the 'verbose = TRUE' option to investgiate further. The 'zi_repair()' function may be used to address isses.")
+    }
+  }
+
+  if (is.null(excludes) == FALSE){
+    valid <- zi_validate(excludes, style = style)
+
+    if (valid == FALSE){
+      stop("ZCTA data passed to the 'excludes' argument are invalid. Please use 'zi_validate()' with the 'verbose = TRUE' option to investgiate further. The 'zi_repair()' function may be used to address isses.")
+    }
+  }
+
 
   # call sub functions
   if (style == "zcta5"){
@@ -403,3 +425,7 @@ zi_get_zcta3 <- function(year, state, county, cb, starts_with,
   return(out)
 
 }
+
+# validate starts with
+
+
