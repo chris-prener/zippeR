@@ -20,7 +20,7 @@ zi_load_crosswalk <- function(year){
 
   # global variables
   CityName = PO_NAME = StateAbbr = StateName = ZCTA_USE = ZIP =
-    ZIPType = ZIP_TYPE = NULL
+    ZIPType = ZIP_TYPE = ZCTA = ZIP_CODE = NULL
 
   # check inputs
   if (is.numeric(year) == FALSE){
@@ -87,7 +87,7 @@ zi_load_crosswalk <- function(year){
     out <- dplyr::rename(out, ZIP = ZIP_CODE)
 
     ## remove non-ZCTA geometries
-    if (year %in% c(2019:2020)){
+    if (year %in% c(2019:2021)){
       out <- dplyr::filter(out, ZCTA != "No ZCTA")
     }
   }
@@ -97,6 +97,19 @@ zi_load_crosswalk <- function(year){
 
   # convert to tibble
   out <- tibble::as_tibble(out)
+
+  # check validation
+  valid_zip <- zi_validate(out$ZIP)
+
+  if (valid_zip == FALSE){
+    warning("The 'ZIP' column failed initial validation. Inspect it closely and address issues found with 'zi_validate()' before using.")
+  }
+
+  valid_zcta <- zi_validate(out$ZCTA)
+
+  if (valid_zcta == FALSE){
+    warning("The 'ZCTA' column failed initial validation. Inspect it closely and address issues found with 'zi_validate()' before using.")
+  }
 
   # return output
   return(out)

@@ -1,7 +1,8 @@
 #' Crosswalk ZIP Codes with ZCTA Dictionary
 #'
 #' @description This function compares input data containing ZIP Codes with
-#'     a crosswalk file
+#'     a crosswalk file that will append ZCTAs. This is an important step because
+#'     not all ZIP Codes have the same five digits as their enclosing ZCTA.
 #'
 #' @param .data An "input object" that is data.frame or tibble that contains
 #'     ZIP Codes to be crosswalked.
@@ -20,8 +21,19 @@
 #'     to another name.
 #' @param dict_zcta The name of the column in the "dictionary object" that contains
 #'     ZCTA data. This is \code{"ZCTA"} by default, but can be changed optionally
-#'     to another name.
+#'     to another name. This could be either a three or five digit ZCTA based
+#'     on the \code{style} argument.
 #' @param style A character scalar - either \code{"zcta5"} or \code{"zcta3"}.
+#'     This applies only to the \code{dict_zcta} argument.
+#'
+#' @return A \code{tibble} with ZCTAs appended.
+#'
+#' @examples
+#' # sample data
+#' zips <- data.frame(id = c(1:3), ZIP = c("63139", "63108", "00501"))
+#'
+#' # crosswalk
+#' zi_crosswalk(zips, input_zip = ZIP)
 #'
 #' @export
 zi_crosswalk <- function(.data, input_zip, dict = "UDS 2021", dict_zip = "ZIP",
@@ -44,17 +56,17 @@ zi_crosswalk <- function(.data, input_zip, dict = "UDS 2021", dict_zip = "ZIP",
   }
 
   # nse
-  in_zipQN <- as.character(substitute(x))
-  dict_zipQN <- as.character(substitute(x))
-  dict_zctaQN <- as.character(substitute(y))
+  in_zipQN <- as.character(substitute(input_zip))
+  dict_zipQN <- as.character(substitute(dict_zip))
+  dict_zctaQN <- as.character(substitute(dict_zcta))
 
   # verify columns
   if (in_zipQN %in% names(.data) == FALSE){
     stop("The given 'input_zip' column is not found in your input object.")
   }
 
-  if (dict_zctaQN %in% names(dict) == FALSE){
-    stop("The given 'dict_zcta' column is not found in your dictionary object.")
+  if (dict_zipQN %in% names(dict) == FALSE){
+    stop("The given 'dict_zip' column is not found in your dictionary object.")
   }
 
   if (dict_zctaQN %in% names(dict) == FALSE){
@@ -62,11 +74,35 @@ zi_crosswalk <- function(.data, input_zip, dict = "UDS 2021", dict_zip = "ZIP",
   }
 
   # verify formatting for ZIPs
+  valid <- zi_validate(.data[[in_zipQN]])
 
-  # subsect dictionary
-  dict <- dplyr::select(dict, dict_zipQN, dict_zctaQN)
+  if (valid == FALSE){
+    stop(paste0("Input ZIP Code data in the '", in_zipQN, "' column are invalid. Please use 'zi_validate()' with the 'verbose = TRUE' option to investgiate further. The 'zi_repair()' function may be used to address isses."))
+  }
+
+  valid <- zi_validate(dict[[dict_zipQN]])
+
+  if (valid == FALSE){
+    stop(paste0("Dictionary ZIP Code data in the '", dict_zipQN, "' column are invalid. Please use 'zi_validate()' with the 'verbose = TRUE' option to investgiate further. The 'zi_repair()' function may be used to address isses."))
+  }
+
+  valid <- zi_validate(dict[[dict_zctaQN]], style = style)
+
+  if (valid == FALSE){
+    stop(paste0("Dictionary ZCTA data in the '", dict_zctaQN, "' column are invalid. Please use 'zi_validate()' with the 'verbose = TRUE' option to investgiate further. The 'zi_repair()' function may be used to address isses."))
+  }
+
+  # subset dictionary
+  dict <- dplyr::select(dict, c(dict_zipQN, dict_zctaQN))
+
+
+  # join with input data
+  out <- dplyr::left_join(.data, dict, by = stats::setNames(dict_zipQN, in_zipQN))
+
+  # create tibble
+  out <- tibble::as_tibble(out)
+
+  # return output
+  return(out)
 
 }
-
-
-

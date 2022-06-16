@@ -35,11 +35,25 @@ to another name.}
 
 \item{dict_zcta}{The name of the column in the "dictionary object" that contains
 ZCTA data. This is \code{"ZCTA"} by default, but can be changed optionally
-to another name.}
+to another name. This could be either a three or five digit ZCTA based
+on the \code{style} argument.}
 
-\item{style}{A character scalar - either \code{"zcta5"} or \code{"zcta3"}.}
+\item{style}{A character scalar - either \code{"zcta5"} or \code{"zcta3"}.
+This applies only to the \code{dict_zcta} argument.}
+}
+\value{
+A \code{tibble} with ZCTAs appended.
 }
 \description{
 This function compares input data containing ZIP Codes with
-    a crosswalk file
+    a crosswalk file that will append ZCTAs. This is an important step because
+    not all ZIP Codes have the same five digits as their enclosing ZCTA.
+}
+\examples{
+# sample data
+zips <- data.frame(id = c(1:3), ZIP = c("63139", "63108", "00501"))
+
+# crosswalk
+zi_crosswalk(zips, input_zip = ZIP)
+
 }

@@ -20,6 +20,7 @@ Imports:
     rio,
     sf,
     spatstat.geom,
+    stats,
     stringr,
     tibble,
     tidycensus,
