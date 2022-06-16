@@ -18,6 +18,7 @@ Since USPS ZIP Codes are not identical to Census Bureau ZCTAs,
     data containing ZIP Codes should be crosswalked to identify the proper
     ZCTA. The American Academy of Family Physicians publishes open-source
     crosswalk files on their UDS Mapper website (\url{https://udsmapper.org/}).
-    This function loads the crosswalk files so that they can be previewed
-    from within R.
+    This function loads the crosswalk files
+    (\url{https://udsmapper.org/zip-code-to-zcta-crosswalk/}) so that they
+    can be previewed from within R.
 }

@@ -1,0 +1,72 @@
+#' Crosswalk ZIP Codes with ZCTA Dictionary
+#'
+#' @description This function compares input data containing ZIP Codes with
+#'     a crosswalk file
+#'
+#' @param .data An "input object" that is data.frame or tibble that contains
+#'     ZIP Codes to be crosswalked.
+#' @param input_zip The column in the input data that contains five-digit ZIP
+#'     Codes. If the input is numeric, it will be transformed to character data
+#'     and leading zeros will be added.
+#' @param dict A "dictionary object" that contains ZIP Code to ZCTA crosswalks.
+#'     This can either be an object in the user's global environment or,
+#'     alternatively, a string that corresponds to the vintage of UDS Mapper crosswalk
+#'     files to be used. Valid strings are formatted with \code{"UDS"} followed by
+#'     a year between 2010 and 2021 so that a complete input looks like
+#'     \code{dict = "UDS 2020"}. See \code{zi_load_crosswalk()} for additional
+#'     information and to preview these objects.
+#' @param dict_zip The name of the column in the "dictionary object" that contains
+#'     ZIP Code data. This is \code{"ZIP"} by default, but can be changed optionally
+#'     to another name.
+#' @param dict_zcta The name of the column in the "dictionary object" that contains
+#'     ZCTA data. This is \code{"ZCTA"} by default, but can be changed optionally
+#'     to another name.
+#' @param style A character scalar - either \code{"zcta5"} or \code{"zcta3"}.
+#'
+#' @export
+zi_crosswalk <- function(.data, input_zip, dict = "UDS 2021", dict_zip = "ZIP",
+                         dict_zcta = "ZCTA", style = "zcta5"){
+
+  # optionally pull UDC crosswalk
+  if (inherits(dict, what = "data.frame") == FALSE){
+
+    ## pull year
+    yr <- as.numeric(stringr::word(dict, 2))
+
+    ## validate year
+    if (yr %in% c(2010:2021) == FALSE){
+      stop("The 'dict' value provided is invalid. Please provide a value between 'UDS 2010' and 'UDS 2021'.")
+    }
+
+    ## load dictionary object
+    dict <- zi_load_crosswalk(year = yr)
+
+  }
+
+  # nse
+  in_zipQN <- as.character(substitute(x))
+  dict_zipQN <- as.character(substitute(x))
+  dict_zctaQN <- as.character(substitute(y))
+
+  # verify columns
+  if (in_zipQN %in% names(.data) == FALSE){
+    stop("The given 'input_zip' column is not found in your input object.")
+  }
+
+  if (dict_zctaQN %in% names(dict) == FALSE){
+    stop("The given 'dict_zcta' column is not found in your dictionary object.")
+  }
+
+  if (dict_zctaQN %in% names(dict) == FALSE){
+    stop("The given 'dict_zcta' column is not found in your dictionary object.")
+  }
+
+  # verify formatting for ZIPs
+
+  # subsect dictionary
+  dict <- dplyr::select(dict, dict_zipQN, dict_zctaQN)
+
+}
+
+
+

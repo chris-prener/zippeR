@@ -4,8 +4,9 @@
 #'     data containing ZIP Codes should be crosswalked to identify the proper
 #'     ZCTA. The American Academy of Family Physicians publishes open-source
 #'     crosswalk files on their UDS Mapper website (\url{https://udsmapper.org/}).
-#'     This function loads the crosswalk files so that they can be previewed
-#'     from within R.
+#'     This function loads the crosswalk files
+#'     (\url{https://udsmapper.org/zip-code-to-zcta-crosswalk/}) so that they
+#'     can be previewed from within R.
 #'
 #' @usage zi_load_crosswalk(year)
 #'
@@ -54,7 +55,9 @@ zi_load_crosswalk <- function(year){
 
     ## additional fixes
     if (year == 2014){
-      out <- dplyr::arrange(out, ZIP)
+
+      out <- dplyr::mutate(out, ZIP = ifelse(ZIP == "4691", "04691", ZIP))
+
     } else if (year %in% c(2010:2013) == TRUE){
 
       # remove military ZIPs
@@ -71,11 +74,26 @@ zi_load_crosswalk <- function(year){
         ZIP_TYPE == "S" ~ "ZIP Code area"
       ))
 
+      # fix ZIPs in 2020
+      if (year == 2010){
+        out <- dplyr::filter(out, ZCTA != "N/A")
+      }
+
     }
 
-  } else if (year == 2015){
-    out <- dplyr::arrange(out, ZIP)
+  } else if (year %in% c(2017:2021)){
+
+    ## fix ZIP code name
+    out <- dplyr::rename(out, ZIP = ZIP_CODE)
+
+    ## remove non-ZCTA geometries
+    if (year %in% c(2019:2020)){
+      out <- dplyr::filter(out, ZCTA != "No ZCTA")
+    }
   }
+
+  # re-order output
+  out <- dplyr::arrange(out, ZIP)
 
   # convert to tibble
   out <- tibble::as_tibble(out)
