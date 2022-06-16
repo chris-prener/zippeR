@@ -104,7 +104,7 @@ zi_get_geometry <- function(year, style = "zcta5", return = "id", class = "sf",
   }
 
   if (year %in% c(2010:2021) == FALSE){
-    stop("The 'year' value provided is invalid. Please provide a numeric value between years 2010 and 2021.")
+    stop("The 'year' value provided is invalid. Please provide a year between 2010 and 2021.")
   }
 
   if (style %in% c("zcta5", "zcta3") == FALSE){

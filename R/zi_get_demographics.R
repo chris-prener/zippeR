@@ -59,7 +59,7 @@ zi_get_demographics <- function(year, variables = NULL,
 
   # check inputs
   if (is.numeric(year) == FALSE){
-    stop("The 'year' value provided is invalid. Please provide a numeric value for 2010 or 2020.")
+    stop("The 'year' value provided is invalid. Please provide a numeric value between 2010 and 2020.")
   }
 
   if (length(survey) > 1){
