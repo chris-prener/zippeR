@@ -74,19 +74,25 @@ zi_crosswalk <- function(.data, input_zip, dict = "UDS 2021", dict_zip = "ZIP",
   }
 
   # verify formatting for ZIPs
-  valid <- zi_validate(x = .data[[in_zipQN]])
+  test <- .data[[in_zipQN]]
+
+  valid <- zi_validate(x = test)
 
   if (valid == FALSE){
     stop(paste0("Input ZIP Code data in the '", in_zipQN, "' column are invalid. Please use 'zi_validate()' with the 'verbose = TRUE' option to investgiate further. The 'zi_repair()' function may be used to address isses."))
   }
 
-  valid <- zi_validate(x = dict[[dict_zipQN]])
+  test <- dict[[dict_zipQN]]
+
+  valid <- zi_validate(x = test)
 
   if (valid == FALSE){
     stop(paste0("Dictionary ZIP Code data in the '", dict_zipQN, "' column are invalid. Please use 'zi_validate()' with the 'verbose = TRUE' option to investgiate further. The 'zi_repair()' function may be used to address isses."))
   }
 
-  valid <- zi_validate(x = dict[[dict_zctaQN]], style = style)
+  test <- dict[[dict_zctaQN]]
+
+  valid <- zi_validate(x = test, style = style)
 
   if (valid == FALSE & style == "zcta5"){
     stop(paste0("Dictionary ZCTA data in the '", dict_zctaQN, "' column are invalid. Please use 'zi_validate()' with the 'verbose = TRUE' option to investgiate further. The 'zi_repair()' function may be used to address isses."))
@@ -96,7 +102,9 @@ zi_crosswalk <- function(.data, input_zip, dict = "UDS 2021", dict_zip = "ZIP",
 
     dict[[dict_zctaQN]] <- substr(dict[[dict_zctaQN]], 1, 3)
 
-    valid <- zi_validate(x = dict[[dict_zctaQN]], style = style)
+    test <- dict[[dict_zctaQN]]
+
+    valid <- zi_validate(x = test, style = "zcta3")
 
     if (valid == FALSE){
       stop(paste0("Dictionary ZCTA data in the '", dict_zctaQN, "' column are invalid. Please use 'zi_validate()' with the 'verbose = TRUE' option to investgiate further. The 'zi_repair()' function may be used to address isses."))
