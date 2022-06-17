@@ -35,6 +35,12 @@
 #' # successful validation
 #' zi_validate(zips)
 #'
+#' # sample five-digit ZIPs in data frame
+#' zips <- data.frame(id = c(1:3), ZIP = c("63139", "63108", "00501"))
+#'
+#' # successful validation
+#' zi_validate(zips$ZIP)
+#'
 #' # sample five-digit ZIPs with character
 #' zips <- c("63088", "63108", "zip")
 #'
@@ -70,7 +76,7 @@ zi_validate <- function(x, style = "zcta5", verbose = FALSE){
   }
 
   # ensure length and padding
-  chr_len <- unique(nchar(as.character(x)))
+  chr_len <- unique(nchar(x))
   chr_len <- chr_len[!is.na(chr_len)]
 
   ## inputs are too long

@@ -47,6 +47,12 @@ zips <- c("63088", "63108", "63139")
 # successful validation
 zi_validate(zips)
 
+# sample five-digit ZIPs in data frame
+zips <- data.frame(id = c(1:3), ZIP = c("63139", "63108", "00501"))
+
+# successful validation
+zi_validate(zips$ZIP)
+
 # sample five-digit ZIPs with character
 zips <- c("63088", "63108", "zip")
 

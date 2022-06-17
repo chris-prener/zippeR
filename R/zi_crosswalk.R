@@ -28,13 +28,6 @@
 #'
 #' @return A \code{tibble} with ZCTAs appended.
 #'
-#' @examples
-#' # sample data
-#' zips <- data.frame(id = c(1:3), ZIP = c("63139", "63108", "00501"))
-#'
-#' # crosswalk
-#' zi_crosswalk(zips, input_zip = ZIP)
-#'
 #' @export
 zi_crosswalk <- function(.data, input_zip, dict = "UDS 2021", dict_zip = "ZIP",
                          dict_zcta = "ZCTA", style = "zcta5"){
