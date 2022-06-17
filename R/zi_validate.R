@@ -50,8 +50,8 @@ zi_validate <- function(x, style = "zcta5", verbose = FALSE){
     stop("Please provide a vector of data for validation.")
   }
 
-  if (is.vector(x) == FALSE){
-    stop("Please provide a vector of data for validation.")
+  if (is.data.frame(x) == TRUE){
+    stop("Please provide a vector of data, instead of a data frame, for validation.")
   }
 
   if (style %in% c("zcta5", "zcta3") == FALSE){
@@ -204,8 +204,8 @@ zi_repair <- function(x, style = "zcta5"){
     stop("Please provide a vector of data for validation.")
   }
 
-  if (is.vector(x) == FALSE){
-    stop("Please provide a vector of data for validation.")
+  if (is.data.frame(x) == TRUE){
+    stop("Please provide a vector of data, instead of a data frame, for validation.")
   }
 
   if (style %in% c("zcta5", "zcta3") == FALSE){
