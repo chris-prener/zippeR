@@ -31,9 +31,4 @@ zi_get_demographics(year = 2012, variables = "B01003_001", survey = "acs5") %>%
 zi_get_demographics(year = 2020, variables = c("B01003_001", "B19083_001"), survey = "acs5") %>%
   zi_aggregate(year = 2020, extensive = "B01003_001", intensive = "B19083_001", survey = "acs5") -> dec20
 
-#' @examples
-#' # sample data
-#' zips <- data.frame(id = c(1:3), ZIP = c("63139", "63108", "00501"))
-#'
-#' # crosswalk
-#' zi_crosswalk(zips, input_zip = ZIP)
+

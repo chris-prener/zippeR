@@ -49,3 +49,11 @@ This function compares input data containing ZIP Codes with
     a crosswalk file that will append ZCTAs. This is an important step because
     not all ZIP Codes have the same five digits as their enclosing ZCTA.
 }
+\examples{
+# sample data
+zips <- data.frame(id = c(1:3), ZIP = c("63139", "63108", "00501"))
+
+# crosswalk
+zi_crosswalk(zips, input_zip = ZIP)
+
+}

@@ -70,7 +70,7 @@ zi_validate <- function(x, style = "zcta5", verbose = FALSE){
   }
 
   # ensure length and padding
-  chr_len <- unique(nchar(x))
+  chr_len <- unique(nchar(as.character(x)))
   chr_len <- chr_len[!is.na(chr_len)]
 
   ## inputs are too long
