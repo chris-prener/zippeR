@@ -47,11 +47,11 @@ zi_validate <- function(x, style = "zcta5", verbose = FALSE){
 
   # check inputs
   if (missing(x) == TRUE){
-    stop("Please provide a vector of data  for validation.")
+    stop("Please provide a vector of data for validation.")
   }
 
   if (is.vector(x) == FALSE){
-    stop("Please provide a vector of data  for validation.")
+    stop("Please provide a vector of data for validation.")
   }
 
   if (style %in% c("zcta5", "zcta3") == FALSE){
@@ -201,11 +201,11 @@ zi_repair <- function(x, style = "zcta5"){
 
   # check inputs
   if (missing(x) == TRUE){
-    stop("Please provide a vector of data  for validation.")
+    stop("Please provide a vector of data for validation.")
   }
 
   if (is.vector(x) == FALSE){
-    stop("A vector of data is required for validation.")
+    stop("Please provide a vector of data for validation.")
   }
 
   if (style %in% c("zcta5", "zcta3") == FALSE){
