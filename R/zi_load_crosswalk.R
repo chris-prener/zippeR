@@ -15,7 +15,7 @@
 #'
 #' @return A tibble containing the UDS Mapper crosswalk file for a given year.
 #'
-#' @example
+#' @examples
 #' zi_load_crosswalk(year = 2020)
 #'
 #' @export

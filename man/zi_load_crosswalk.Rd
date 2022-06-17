@@ -22,3 +22,7 @@ Since USPS ZIP Codes are not identical to Census Bureau ZCTAs,
     (\url{https://udsmapper.org/zip-code-to-zcta-crosswalk/}) so that they
     can be previewed from within R.
 }
+\examples{
+zi_load_crosswalk(year = 2020)
+
+}
