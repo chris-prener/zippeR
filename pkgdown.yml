@@ -2,7 +2,7 @@ pandoc: 2.14.2
 pkgdown: 2.0.4
 pkgdown_sha: ~
 articles: {}
-last_built: 2022-06-17T14:31Z
+last_built: 2022-06-17T14:42Z
 urls:
   reference: https://chris-prener.github.io/zippeR/reference
   article: https://chris-prener.github.io/zippeR/articles
