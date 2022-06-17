@@ -242,9 +242,9 @@ zi_repair <- function(x, style = "zcta5"){
     if (valid$result[2] == FALSE){
 
       if (style == "zcta5"){
-        x <- ifelse(is.na(x) == TRUE, x, sprintf("%05s", x))
+        x <- stringr::str_pad(x, 5, pad = "0")
       } else if (style == "zcta3"){
-        x <- ifelse(is.na(x) == TRUE, x, sprintf("%03s", x))
+        x <- stringr::str_pad(x, 3, pad = "0")
       }
 
     }
