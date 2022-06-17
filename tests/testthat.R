@@ -1,4 +1,4 @@
 library(testthat)
-library(deprivateR)
+library(zippeR)
 
 test_check("zippeR")
