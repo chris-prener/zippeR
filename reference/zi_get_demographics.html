@@ -113,8 +113,10 @@ written to <code>.Renviron</code> by using <code>Sys.getenv("CENSUS_API_KEY")</c
 
 
 <dt>debug</dt>
-<dd><p>A logical scalar; if <code>TRUE</code>, the call made to the
-Census API will be returned. This can be very useful in debugging and
+<dd><p>Additional parameters for debugging and testing
+<code>deprivateR</code>. The two current styles are <code>"messages"</code> (will
+print all messages from <code>tidycensus</code>) and <code>"call"</code> (will print
+the call made to the Census API). This can be very useful in debugging and
 determining if error messages returned are due to <code>tidycensus</code>,
 <code>zippeR</code>, or the Census API. Copy to the API call into a browser
 and see what is returned by the API directly.</p></dd>
