@@ -38,8 +38,10 @@
 #'     \code{tidycensus::census_api_key()} has been used to write your key to
 #'     your \code{.Renviron} file. You can check whether an API key has been
 #'     written to \code{.Renviron} by using \code{Sys.getenv("CENSUS_API_KEY")}.
-#' @param debug A logical scalar; if \code{TRUE}, the call made to the
-#'     Census API will be returned. This can be very useful in debugging and
+#' @param debug Additional parameters for debugging and testing
+#'     \code{deprivateR}. The two current styles are \code{"messages"} (will
+#'     print all messages from \code{tidycensus}) and \code{"call"} (will print
+#'     the call made to the Census API). This can be very useful in debugging and
 #'     determining if error messages returned are due to \code{tidycensus},
 #'     \code{zippeR}, or the Census API. Copy to the API call into a browser
 #'     and see what is returned by the API directly.
@@ -98,34 +100,44 @@ zi_get_demographics <- function(year, variables = NULL,
 
   # set additional arguments
   ## debugging to pass to tidycensus
-  if (is.null(debug) == FALSE){
-
-    if (debug %in% c("call") == FALSE){
-      stop("The 'debug' argument is invalid. Please choose one of 'call', ")
-    }
-
-    if (debug == "call"){
-      call <- TRUE
-    } else {
-      call <- FALSE
-    }
-  } else {
-    call <- FALSE
+  if (is.null(debug)){
+    debug <- "live"
   }
 
   # call underlying tidycensus data
   if (survey %in% c("sf1", "sf3")){
 
     ## call get_decennial
-    out <- tidycensus::get_decennial(geography = "zcta", variables = variables,
-                                     table = table, year = year, output = output,
-                                     sumfile = survey, key = key, show_call = call)
+    if (debug == "live"){
+      out <- suppressMessages(tidycensus::get_decennial(geography = "zcta", variables = variables,
+                                                        table = table, year = year, output = output,
+                                                        sumfile = survey, key = key))
+    } else if (debug == "messages"){
+      out <- tidycensus::get_decennial(geography = "zcta", variables = variables,
+                                       table = table, year = year, output = output,
+                                       sumfile = survey, key = key)
+    } else if (debug == "call"){
+      out <- tidycensus::get_decennial(geography = "zcta", variables = variables,
+                                       table = table, year = year, output = output,
+                                       sumfile = survey, key = key, show_call = TRUE)
+    }
+
   } else if (survey %in% c("acs1", "acs3", "acs5")){
 
     ## call get_acs
-    out <- tidycensus::get_acs(geography = "zcta", variables = variables,
-                               table = table, year = year, output = output,
-                               survey = survey, key = key, show_call = call)
+    if (debug == "live"){
+      out <- suppressMessages(tidycensus::get_acs(geography = "zcta", variables = variables,
+                                                  table = table, year = year, output = output,
+                                                  survey = survey, key = key))
+    } else if (debug == "messages"){
+      out <- tidycensus::get_acs(geography = "zcta", variables = variables,
+                                 table = table, year = year, output = output,
+                                 survey = survey, key = key)
+    } else if (debug == "call"){
+      out <- tidycensus::get_acs(geography = "zcta", variables = variables,
+                                 table = table, year = year, output = output,
+                                 survey = survey, key = key, show_call = TRUE)
+    }
 
     ## prep data
     out <- dplyr::mutate(out, GEOID = stringr::word(NAME, 2))

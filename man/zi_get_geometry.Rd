@@ -70,6 +70,11 @@ will be re-positioned so that the lie to the southwest of the continental
 United States. This defaults to \code{FALSE}, and can only be used when
 states are not listed for the \code{state} argument. It does not apply
 if \code{class = "tibble"}.}
+
+\item{debug}{Additional parameters for debugging and testing
+\code{deprivateR}. The two current styles are \code{"messages"} (will
+print all messages from \code{tigris}) and \code{"warnings"} (will print
+all warnings form \code{sf}).}
 }
 \value{
 A \code{sf} object with ZCTAs matching the parameters specified above:

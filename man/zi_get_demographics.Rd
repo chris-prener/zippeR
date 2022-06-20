@@ -46,8 +46,10 @@ contain five-digit ZCTAs.}
 your \code{.Renviron} file. You can check whether an API key has been
 written to \code{.Renviron} by using \code{Sys.getenv("CENSUS_API_KEY")}.}
 
-\item{debug}{A logical scalar; if \code{TRUE}, the call made to the
-Census API will be returned. This can be very useful in debugging and
+\item{debug}{Additional parameters for debugging and testing
+\code{deprivateR}. The two current styles are \code{"messages"} (will
+print all messages from \code{tidycensus}) and \code{"call"} (will print
+the call made to the Census API). This can be very useful in debugging and
 determining if error messages returned are due to \code{tidycensus},
 \code{zippeR}, or the Census API. Copy to the API call into a browser
 and see what is returned by the API directly.}

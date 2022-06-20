@@ -61,6 +61,10 @@
 #'     United States. This defaults to \code{FALSE}, and can only be used when
 #'     states are not listed for the \code{state} argument. It does not apply
 #'     if \code{class = "tibble"}.
+#' @param debug Additional parameters for debugging and testing
+#'     \code{deprivateR}. The two current styles are \code{"messages"} (will
+#'     print all messages from \code{tigris}) and \code{"warnings"} (will print
+#'     all warnings form \code{sf}).
 #'
 #' @details This function contains options for both the type of ZCTA and,
 #'     optionally, for how state and county data are identified. For type,
@@ -96,7 +100,7 @@
 zi_get_geometry <- function(year, style = "zcta5", return = "id", class = "sf",
                             state = NULL, county = NULL, cb = FALSE,
                             starts_with = NULL, includes = NULL, excludes = NULL,
-                            method, shift_geo = FALSE){
+                            method, shift_geo = FALSE, debug = NULL){
 
   # check inputs
   if (is.numeric(year) == FALSE){
@@ -184,20 +188,24 @@ zi_get_geometry <- function(year, style = "zcta5", return = "id", class = "sf",
     year <- 2010
   }
 
+  if (is.null(debug)){
+    debug <- "live"
+  }
+
   # call sub functions
   if (style == "zcta5"){
 
     out <- zi_get_zcta5(year = year, return = return, state = state,
                         county = county, cb = cb, starts_with = starts_with,
                         includes = includes, excludes = excludes,
-                        method = method)
+                        method = method, debug = debug)
 
   } else if (style == "zcta3"){
 
     out <- zi_get_zcta3(year = year, state = state,
                         county = county, cb = cb, starts_with = starts_with,
                         includes = includes, excludes = excludes,
-                        method = method)
+                        method = method, debug = debug)
 
   }
 
@@ -226,16 +234,20 @@ zi_get_geometry <- function(year, style = "zcta5", return = "id", class = "sf",
 
 ## Sub Function for ZCTA5
 zi_get_zcta5 <- function(year, return = "id", state, county, cb, starts_with,
-                         includes, excludes, method){
+                         includes, excludes, method, debug){
 
   # global variables
   GEOID10 = GEOID20 = GEOID = NULL
 
-  # download geometry
-  if (is.null(state) == FALSE & is.null(county) == TRUE) {
-
-    ## tigris call
+  # tigris call
+  if (debug == "live"){
+    out <- suppressMessages(tigris::zctas(year = year, cb = cb))
+  } else if (debug == "messages"){
     out <- tigris::zctas(year = year, cb = cb)
+  }
+
+  # process geometry
+  if (is.null(state) == FALSE & is.null(county) == TRUE) {
 
     ## generate vector of requested state ZCTAs
     zcta_vec <- zi_list_zctas(year = year, state = state, method = method)
@@ -256,13 +268,10 @@ zi_get_zcta5 <- function(year, return = "id", state, county, cb, starts_with,
 
   } else if (is.null(state) == FALSE & is.null(county) == FALSE){
 
-    ## tigris call
-    out <- tigris::zctas(year = year, cb = cb)
-
     ## geoprocess based on county to produced vector of ZTAs
     zcta_vec <- zi_process_county(cb = cb, state = state, county = county,
                                   year = year, zcta = out, method = method,
-                                  style = "zcta5")
+                                  style = "zcta5", debug = debug)
 
     ## add inclusions, remove exclusions
     zcta_vec <- unique(c(zcta_vec, includes))
@@ -279,9 +288,6 @@ zi_get_zcta5 <- function(year, return = "id", state, county, cb, starts_with,
     out <- dplyr::filter(out, GEOID %in% zcta_vec == TRUE)
 
   } else if (is.null(state) == TRUE & is.null(county) == TRUE){
-
-    ## tigirs call
-    out <- tigris::zctas(year = year, cb = cb)
 
     ## rename year
     if (year < 2020){
@@ -315,13 +321,18 @@ zi_get_zcta5 <- function(year, return = "id", state, county, cb, starts_with,
 }
 
 ## Sub Function for Processing County-level Data
-zi_process_county <- function(cb, state, county, year, zcta, method, style){
+zi_process_county <- function(cb, state, county, year, zcta, method, style, debug){
 
   # global variables
   GEOID = GEOID10 = GEOID20 = NULL
 
-  # download and prep geometry
-  counties <- suppressMessages(tigris::counties(cb = cb, state = state, year = year))
+  # tigris call
+  if (debug == "live"){
+    counties <- suppressMessages(tigris::counties(cb = cb, state = state, year = year))
+  } else if (debug == "messages"){
+    counties <- tigris::counties(cb = cb, state = state, year = year)
+  }
+
   counties <- dplyr::select(counties, GEOID)
   counties <- dplyr::filter(counties, GEOID %in% county)
 
@@ -340,7 +351,11 @@ zi_process_county <- function(cb, state, county, year, zcta, method, style){
   }
 
   # geoprocess
-  intersect <- suppressWarnings(sf::st_intersection(zcta, counties))
+  if (debug == "live"){
+    intersect <- suppressWarnings(sf::st_intersection(zcta, counties))
+  } else if (debug == "warnings"){
+    intersect <- sf::st_intersection(zcta, counties)
+  }
 
   # create output
   if (style == "zcta5"){
@@ -360,7 +375,7 @@ zi_process_county <- function(cb, state, county, year, zcta, method, style){
 
 ## Sub Function for ZCTA3
 zi_get_zcta3 <- function(year, state, county, cb, starts_with,
-                         includes, excludes, method){
+                         includes, excludes, method, debug){
 
   # global variables
   ZCTA3 = GEOID10 = GEOID20 = NULL
@@ -369,10 +384,10 @@ zi_get_zcta3 <- function(year, state, county, cb, starts_with,
   val <- paste0("zcta3_", year)
 
   # download geometry
-  if (is.null(state) == FALSE & is.null(county) == TRUE) {
+  out <- sf::st_read(zcta3_url[[val]])
 
-    ## github download
-    out <- sf::st_read(zcta3_url[[val]])
+  # process geometry
+  if (is.null(state) == FALSE & is.null(county) == TRUE) {
 
     ## generate vector of requested state ZCTAs
     zcta_vec <- zi_list_zctas(year = year, state = state, method = method)
@@ -391,13 +406,10 @@ zi_get_zcta3 <- function(year, state, county, cb, starts_with,
 
   } else if (is.null(state) == FALSE & is.null(county) == FALSE){
 
-    ## github download
-    out <- sf::st_read(zcta3_url[[val]])
-
     ## geoprocess based on county to produced vector of ZTAs
     zcta_vec <- zi_process_county(cb = cb, state = state, county = county,
                                   year = year, zcta = out, method = method,
-                                  style = "zcta3")
+                                  style = "zcta3", debug = debug)
 
     ## add inclusions, remove exclusions
     zcta_vec <- unique(c(zcta_vec, includes))
@@ -408,13 +420,11 @@ zi_get_zcta3 <- function(year, state, county, cb, starts_with,
 
   } else if (is.null(state) == TRUE & is.null(county) == TRUE){
 
-    ## github download
-    out <- sf::st_read(zcta3_url[[val]])
-
-    ## subset based on year
+    ## remove exclusions
     if (is.null(excludes) == FALSE){
       out <- dplyr::filter(out, ZCTA3 %in% excludes == FALSE)
     }
+
   }
 
   # subset based on starts with
