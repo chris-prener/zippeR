@@ -63,7 +63,8 @@
 #'     if \code{class = "tibble"}.
 #' @param debug Additional parameters for debugging and testing
 #'     \code{deprivateR}. The two current styles are \code{"messages"} (will
-#'     print all messages from \code{tigris}) and \code{"warnings"} (will print
+#'     print all messages from \code{tigris} for five-digit ZCTAs or from
+#'     \code{sf} for three-digit ZCTAs) and \code{"warnings"} (will print
 #'     all warnings form \code{sf}).
 #'
 #' @details This function contains options for both the type of ZCTA and,
@@ -384,7 +385,11 @@ zi_get_zcta3 <- function(year, state, county, cb, starts_with,
   val <- paste0("zcta3_", year)
 
   # download geometry
-  out <- sf::st_read(zcta3_url[[val]])
+  if (debug == "live"){
+    out <- sf::st_read(zcta3_url[[val]], quiet = TRUE)
+  } else if (debug == "messages"){
+    out <- sf::st_read(zcta3_url[[val]])
+  }
 
   # process geometry
   if (is.null(state) == FALSE & is.null(county) == TRUE) {
