@@ -6,7 +6,8 @@
 \usage{
 zi_get_geometry (year, style = "zcta5", return = "id", class = "sf",
     state = NULL, county = NULL, cb = FALSE, starts_with = NULL,
-    includes = NULL, excludes = NULL, method, shift_geo = FALSE)
+    includes = NULL, excludes = NULL, method, shift_geo = FALSE,
+    debug = NULL)
 }
 \arguments{
 \item{year}{A four-digit numeric scalar for year. \code{zippeR} currently
@@ -73,7 +74,8 @@ if \code{class = "tibble"}.}
 
 \item{debug}{Additional parameters for debugging and testing
 \code{deprivateR}. The two current styles are \code{"messages"} (will
-print all messages from \code{tigris}) and \code{"warnings"} (will print
+print all messages from \code{tigris} for five-digit ZCTAs or from
+\code{sf} for three-digit ZCTAs) and \code{"warnings"} (will print
 all warnings form \code{sf}).}
 }
 \value{

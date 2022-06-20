@@ -9,7 +9,8 @@
 #'
 #' @usage zi_get_geometry (year, style = "zcta5", return = "id", class = "sf",
 #'     state = NULL, county = NULL, cb = FALSE, starts_with = NULL,
-#'     includes = NULL, excludes = NULL, method, shift_geo = FALSE)
+#'     includes = NULL, excludes = NULL, method, shift_geo = FALSE,
+#'     debug = NULL)
 #'
 #' @param year A four-digit numeric scalar for year. \code{zippeR} currently
 #'     supports data between 2010 and 2021.
