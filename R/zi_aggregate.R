@@ -53,12 +53,13 @@
 #'     \code{tidycensus::census_api_key()} has been used to write your key to
 #'     your \code{.Renviron} file. You can check whether an API key has been
 #'     written to \code{.Renviron} by using \code{Sys.getenv("CENSUS_API_KEY")}.
-#' @param debug A logical scalar; if \code{TRUE}, the call made to the
-#'     Census API will be returned. This can be very useful in debugging and
+#' @param debug Additional parameters for debugging and testing
+#'     \code{zippeR}. The two current styles are \code{"messages"} (will
+#'     print all messages from \code{tidycensus}) and \code{"call"} (will print
+#'     the call made to the Census API). This can be very useful in debugging and
 #'     determining if error messages returned are due to \code{tidycensus},
 #'     \code{zippeR}, or the Census API. Copy to the API call into a browser
 #'     and see what is returned by the API directly.
-#'
 #' @return A tibble containing all aggregated data requested in either
 #'     \code{"tidy"} or \code{"wide"} format.
 #'
@@ -145,19 +146,8 @@ zi_aggregate <- function(.data, year, extensive = NULL, intensive = NULL,
   }
 
   ## debugging to pass to tidycensus
-  if (is.null(debug) == FALSE){
-
-    if (debug %in% c("call") == FALSE){
-      stop("The 'debug' argument is invalid. Please choose one of 'call', ")
-    }
-
-    if (debug == "call"){
-      call <- TRUE
-    } else {
-      call <- FALSE
-    }
-  } else if (is.null(debug) == TRUE) {
-    call <- FALSE
+  if (is.null(debug)){
+    debug <- "live"
   }
 
   # prep data
@@ -176,7 +166,7 @@ zi_aggregate <- function(.data, year, extensive = NULL, intensive = NULL,
     } else if (extensive_id == FALSE & intensive_id == TRUE){
 
       ## calculate weights
-      weights <- zi_census_weights(year = year, key = key, call = call)
+      weights <- zi_census_weights(year = year, key = key, debug = debug)
 
       ## aggregate
       out <- zi_census_intensive(.data, weights = weights, method = intensive_method)
@@ -188,7 +178,7 @@ zi_aggregate <- function(.data, year, extensive = NULL, intensive = NULL,
       intensive_df <- dplyr::filter(.data, variable %in% intensive == TRUE)
 
       ## calculate weights
-      weights <- zi_census_weights(year = year, key = key, call = call)
+      weights <- zi_census_weights(year = year, key = key, debug = debug)
 
       ## aggregate
       extensive_df <- zi_census_extensive(extensive_df)
@@ -211,7 +201,7 @@ zi_aggregate <- function(.data, year, extensive = NULL, intensive = NULL,
     } else if (extensive_id == FALSE & intensive_id == TRUE){
 
       ## calculate weights
-      weights <- zi_acs_weights(year = year, survey = survey, key = key, call = call)
+      weights <- zi_acs_weights(year = year, survey = survey, key = key, debug = debug)
 
       ## aggregate
       out <- zi_acs_intensive(.data, weights = weights, method = intensive_method)
@@ -223,7 +213,7 @@ zi_aggregate <- function(.data, year, extensive = NULL, intensive = NULL,
       intensive_df <- dplyr::filter(.data, variable %in% intensive == TRUE)
 
       ## calculate weights
-      weights <- zi_acs_weights(year = year, survey = survey, key = key, call = call)
+      weights <- zi_acs_weights(year = year, survey = survey, key = key, debug = debug)
 
       ## aggregate
       extensive_df <- zi_acs_extensive(extensive_df)
@@ -290,15 +280,27 @@ zi_census_intensive <- function(.data, weights, method){
 }
 
 ## Intensive Census Weights
-zi_census_weights <- function(year, key, call){
+zi_census_weights <- function(year, key, debug){
 
   # global variables
   GEOID = NAME = ZCTA3 = total_pop = value = weight = NULL
 
-  ## call get_acs
-  out <- tidycensus::get_decennial(geography = "zcta", variables = "P001001",
-                                   year = year, output = "tidy",
-                                   key = key, show_call = call)
+  ## call get_decennial
+  if (debug == "live"){
+    out <- suppressMessages(tidycensus::get_decennial(geography = "zcta",
+                                                      variables = "P001001",
+                                                      year = year,
+                                                      output = "tidy",
+                                                      key = key))
+  } else if (debug == "messages"){
+    out <- tidycensus::get_decennial(geography = "zcta", variables = "P001001",
+                                     year = year, output = "tidy",
+                                     key = key)
+  } else if (debug == "call"){
+    out <- tidycensus::get_decennial(geography = "zcta", variables = "P001001",
+                                     year = year, output = "tidy",
+                                     key = key, show_call = TRUE)
+  }
 
   ## prep data
   out <- dplyr::mutate(out, ZCTA3 = substr(GEOID, 1, 3), .before = GEOID)
@@ -375,15 +377,27 @@ zi_acs_intensive <- function(.data, weights, method){
 }
 
 ## Intensive ACS Weights
-zi_acs_weights <- function(year, survey, key, call){
+zi_acs_weights <- function(year, survey, key, debug){
 
   # global variables
   GEOID = NAME = ZCTA3 = total_pop = estimate = weight = NULL
 
   ## call get_acs
-  out <- tidycensus::get_acs(geography = "zcta", variables = "B01003_001",
-                             year = year, output = "tidy",
-                             survey = survey, key = key, show_call = call)
+  if (debug == "live"){
+    out <- suppressMessages(tidycensus::get_acs(geography = "zcta",
+                                                variables = "B01003_001",
+                                                year = year, output = "tidy",
+                                                survey = survey, key = key))
+  } else if (debug == "messages"){
+    out <- tidycensus::get_acs(geography = "zcta", variables = "B01003_001",
+                               year = year, output = "tidy",
+                               survey = survey, key = key)
+  } else if (debug == "call"){
+    out <- tidycensus::get_acs(geography = "zcta", variables = "B01003_001",
+                               year = year, output = "tidy",
+                               survey = survey, key = key,
+                               show_call = TRUE)
+  }
 
   ## prep data
   out <- dplyr::mutate(out, GEOID = stringr::word(NAME, 2))

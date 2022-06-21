@@ -6,7 +6,7 @@
 \usage{
 zi_aggregate(.data, year, extensive = NULL, intensive = NULL,
     intensive_method = "mean", survey, output = "tidy", zcta = NULL,
-    debug = NULL)
+    key = NULL, debug = NULL)
 }
 \arguments{
 \item{.data}{A tidy set of demographic data containing one or more variables
@@ -57,8 +57,16 @@ The vector can be created with \code{zi_get_geometry()}. If
 \code{GEOID} values. If \code{style = "zcta3"}, this vector should be
 made up of three-digital \code{ZCTA3} values.}
 
-\item{debug}{A logical scalar; if \code{TRUE}, the call made to the
-Census API will be returned. This can be very useful in debugging and
+\item{key}{A Census API key, which can be obtained at
+\url{https://api.census.gov/data/key_signup.html}. This can be omitted if
+\code{tidycensus::census_api_key()} has been used to write your key to
+your \code{.Renviron} file. You can check whether an API key has been
+written to \code{.Renviron} by using \code{Sys.getenv("CENSUS_API_KEY")}.}
+
+\item{debug}{Additional parameters for debugging and testing
+\code{zippeR}. The two current styles are \code{"messages"} (will
+print all messages from \code{tidycensus}) and \code{"call"} (will print
+the call made to the Census API). This can be very useful in debugging and
 determining if error messages returned are due to \code{tidycensus},
 \code{zippeR}, or the Census API. Copy to the API call into a browser
 and see what is returned by the API directly.}

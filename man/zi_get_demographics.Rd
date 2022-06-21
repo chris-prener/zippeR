@@ -47,7 +47,7 @@ your \code{.Renviron} file. You can check whether an API key has been
 written to \code{.Renviron} by using \code{Sys.getenv("CENSUS_API_KEY")}.}
 
 \item{debug}{Additional parameters for debugging and testing
-\code{deprivateR}. The two current styles are \code{"messages"} (will
+\code{zippeR}. The two current styles are \code{"messages"} (will
 print all messages from \code{tidycensus}) and \code{"call"} (will print
 the call made to the Census API). This can be very useful in debugging and
 determining if error messages returned are due to \code{tidycensus},
