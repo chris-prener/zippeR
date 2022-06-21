@@ -236,7 +236,7 @@ zi_aggregate <- function(.data, year, extensive = NULL, intensive = NULL,
   if (output == "wide"){
 
     ## prep names
-    out <- dplyr::rename("E" = "estimate", "M" = "moe")
+    out <- dplyr::rename(out, "E" = "estimate", "M" = "moe")
 
     ## pivot
     out <- tidyr::pivot_wider(out, id_cols = "ZCTA3", names_from = "variable",
