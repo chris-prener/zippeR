@@ -56,7 +56,7 @@
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">zi_aggregate</span><span class="op">(</span><span class="va">.data</span>, <span class="va">year</span>, extensive <span class="op">=</span> <span class="cn">NULL</span>, intensive <span class="op">=</span> <span class="cn">NULL</span>,
     intensive_method <span class="op">=</span> <span class="st">"mean"</span>, <span class="va">survey</span>, output <span class="op">=</span> <span class="st">"tidy"</span>, zcta <span class="op">=</span> <span class="cn">NULL</span>,
-    debug <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div>
+    key <span class="op">=</span> <span class="cn">NULL</span>, debug <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -125,9 +125,19 @@ The vector can be created with <code><a href="zi_get_geometry.html">zi_get_geome
 made up of three-digital <code>ZCTA3</code> values.</p></dd>
 
 
+<dt>key</dt>
+<dd><p>A Census API key, which can be obtained at
+<a href="https://api.census.gov/data/key_signup.html" class="external-link">https://api.census.gov/data/key_signup.html</a>. This can be omitted if
+<code><a href="https://walker-data.com/tidycensus/reference/census_api_key.html" class="external-link">tidycensus::census_api_key()</a></code> has been used to write your key to
+your <code>.Renviron</code> file. You can check whether an API key has been
+written to <code>.Renviron</code> by using <code>Sys.getenv("CENSUS_API_KEY")</code>.</p></dd>
+
+
 <dt>debug</dt>
-<dd><p>A logical scalar; if <code>TRUE</code>, the call made to the
-Census API will be returned. This can be very useful in debugging and
+<dd><p>Additional parameters for debugging and testing
+<code>zippeR</code>. The two current styles are <code>"messages"</code> (will
+print all messages from <code>tidycensus</code>) and <code>"call"</code> (will print
+the call made to the Census API). This can be very useful in debugging and
 determining if error messages returned are due to <code>tidycensus</code>,
 <code>zippeR</code>, or the Census API. Copy to the API call into a browser
 and see what is returned by the API directly.</p></dd>
