@@ -233,6 +233,25 @@ zi_aggregate <- function(.data, year, extensive = NULL, intensive = NULL,
   }
 
   # optionally pivot
+  if (output == "wide"){
+
+    ## prep names
+    out <- dplyr::rename("E" = "estimate", "M" = "moe")
+
+    ## pivot
+    out <- tidyr::pivot_wider(out, id_cols = "ZCTA3", names_from = "variable",
+                              names_glue = "{variable}{.value}",
+                              values_from = c("E", "M"))
+
+    ## re-order names alphabetically
+    wide_names <- names(out)
+    wide_names <- wide_names[wide_names != "ZCTA3"]
+    wide_names <- c("ZCTA3", sort(wide_names))
+
+    ## re-order columns alphabetically
+    out <- dplyr::select(out, wide_names)
+
+  }
 
   # return output
   return(out)

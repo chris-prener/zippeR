@@ -38,3 +38,16 @@ zi_get_demographics(year = 2012, variables = "B01003_001", survey = "acs5") %>%
 zi_get_demographics(year = 2020, variables = c("B01003_001", "B19083_001"), survey = "acs5") %>%
   zi_aggregate(year = 2020, extensive = "B01003_001", intensive = "B19083_001", survey = "acs5") -> dec20
 
+library(tidyr)
+library(dplyr)
+
+dec20 %>%
+  rename("E" = "estimate", "M" = "moe") %>%
+  pivot_wider(id_cols = "ZCTA3", names_from = "variable", names_glue = "{variable}{.value}",
+              values_from = c("E", "M")) -> dec20_wide
+
+dec20_wide_names <- names(dec20_wide)
+dec20_wide_names <- dec20_wide_names[dec20_wide_names != "ZCTA3"]
+dec20_wide_names <- c("ZCTA3", sort(dec20_wide_names))
+
+dec20_wide <- select(dec20_wide, dec20_wide_names)
