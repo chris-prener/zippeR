@@ -6,7 +6,7 @@
 #'
 #' @usage zi_aggregate(.data, year, extensive = NULL, intensive = NULL,
 #'     intensive_method = "mean", survey, output = "tidy", zcta = NULL,
-#'     debug = NULL)
+#'     key = NULL, debug = NULL)
 #'
 #' @param .data A tidy set of demographic data containing one or more variables
 #'     that should be aggregated to three-digit ZCTAs. This data frame or tibble
@@ -48,6 +48,11 @@
 #'     \code{style = "zcta5"}, this vector should be made up of five-digit
 #'     \code{GEOID} values. If \code{style = "zcta3"}, this vector should be
 #'     made up of three-digital \code{ZCTA3} values.
+#' @param key A Census API key, which can be obtained at
+#'     \url{https://api.census.gov/data/key_signup.html}. This can be omitted if
+#'     \code{tidycensus::census_api_key()} has been used to write your key to
+#'     your \code{.Renviron} file. You can check whether an API key has been
+#'     written to \code{.Renviron} by using \code{Sys.getenv("CENSUS_API_KEY")}.
 #' @param debug A logical scalar; if \code{TRUE}, the call made to the
 #'     Census API will be returned. This can be very useful in debugging and
 #'     determining if error messages returned are due to \code{tidycensus},
@@ -60,7 +65,8 @@
 #' @export
 zi_aggregate <- function(.data, year, extensive = NULL, intensive = NULL,
                          intensive_method = "mean", survey,
-                         output = "tidy", zcta = NULL, debug = NULL){
+                         output = "tidy", zcta = NULL, key = NULL,
+                         debug = NULL){
 
   # global variables
   GEOID = ZCTA3 = key = variable = NULL

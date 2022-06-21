@@ -27,6 +27,7 @@ geo12 <- zi_get_geometry(year = 2012, state = "MO", method = "centroid", include
 geo12_3 <- zi_get_geometry(year = 2012, style = "zcta3", state = "MO", method = "centroid",
                            includes = c("516", "525"))
 
+dec12 <- zi_get_demographics(year = 2012, table = "B19083", survey = "acs5")
 dec12 <- zi_get_demographics(year = 2012, table = "B19083", survey = "acs5", zcta = geo12$GEOID)
 dec12 <- zi_get_demographics(year = 2012, table = "B19083", survey = "acs5", zcta = geo12$GEOID, debug = "messages")
 dec12 <- zi_get_demographics(year = 2012, table = "B19083", survey = "acs5", zcta = geo12$GEOID, debug = "call")
