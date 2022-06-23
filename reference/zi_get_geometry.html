@@ -61,9 +61,9 @@
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">zi_get_geometry</span> <span class="op">(</span><span class="va">year</span>, style <span class="op">=</span> <span class="st">"zcta5"</span>, return <span class="op">=</span> <span class="st">"id"</span>, class <span class="op">=</span> <span class="st">"sf"</span>,
-    state <span class="op">=</span> <span class="cn">NULL</span>, county <span class="op">=</span> <span class="cn">NULL</span>, cb <span class="op">=</span> <span class="cn">FALSE</span>, starts_with <span class="op">=</span> <span class="cn">NULL</span>,
-    includes <span class="op">=</span> <span class="cn">NULL</span>, excludes <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">method</span>, shift_geo <span class="op">=</span> <span class="cn">FALSE</span>,
-    debug <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div>
+    state <span class="op">=</span> <span class="cn">NULL</span>, county <span class="op">=</span> <span class="cn">NULL</span>, territory <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AS"</span>, <span class="st">"GU"</span>, <span class="st">"MP"</span>, <span class="st">"PR"</span>, <span class="st">"VI"</span><span class="op">)</span>,
+    cb <span class="op">=</span> <span class="cn">FALSE</span>, starts_with <span class="op">=</span> <span class="cn">NULL</span>, includes <span class="op">=</span> <span class="cn">NULL</span>, excludes <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">method</span>,
+    shift_geo <span class="op">=</span> <span class="cn">FALSE</span>, debug <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -93,7 +93,7 @@ that omits the geometric data will be returned instead.</p></dd>
 
 
 <dt>state</dt>
-<dd><p>A scalar or vector with character state abbreviations
+<dd><p>A character scalar or vector with character state abbreviations
 (e.x. <code>"MO"</code>) or numeric FIPS codes (e.x. <code>29</code>). ZCTAs that
 are within the given states (determined based on a combination of
 <code>year</code> and <code>method</code>) will be returned. See Details below for
@@ -106,6 +106,13 @@ specified for <code>county</code>.</p></dd>
 <code>"29510"</code>). ZCTAs that are within the given states (determined based
 on a combination of <code>year</code> and <code>method</code>) will be returned. See
 Details below for more information. This argument is optional.</p></dd>
+
+
+<dt>territory</dt>
+<dd><p>A character scalar or vector with character territory abbreviations
+(e.x. <code>"PR"</code>) or numeric FIPS codes (e.x. <code>72</code>). ZCTAs that are
+within the given territories will be returned. By default, all territories
+are included.</p></dd>
 
 
 <dt>cb</dt>
