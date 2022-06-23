@@ -5,9 +5,9 @@
 \title{Download and Optionally Geoprocess ZCTAs}
 \usage{
 zi_get_geometry (year, style = "zcta5", return = "id", class = "sf",
-    state = NULL, county = NULL, cb = FALSE, starts_with = NULL,
-    includes = NULL, excludes = NULL, method, shift_geo = FALSE,
-    debug = NULL)
+    state = NULL, county = NULL, territory = c("AS", "GU", "MP", "PR", "VI"),
+    cb = FALSE, starts_with = NULL, includes = NULL, excludes = NULL, method,
+    shift_geo = FALSE, debug = NULL)
 }
 \arguments{
 \item{year}{A four-digit numeric scalar for year. \code{zippeR} currently
@@ -26,7 +26,7 @@ are returned.}
 suitable for mapping will be returned. If \code{"tibble"}, an object
 that omits the geometric data will be returned instead.}
 
-\item{state}{A scalar or vector with character state abbreviations
+\item{state}{A character scalar or vector with character state abbreviations
 (e.x. \code{"MO"}) or numeric FIPS codes (e.x. \code{29}). ZCTAs that
 are within the given states (determined based on a combination of
 \code{year} and \code{method}) will be returned. See Details below for
@@ -37,6 +37,11 @@ specified for \code{county}.}
 \code{"29510"}). ZCTAs that are within the given states (determined based
 on a combination of \code{year} and \code{method}) will be returned. See
 Details below for more information. This argument is optional.}
+
+\item{territory}{A character scalar or vector with character territory abbreviations
+(e.x. \code{"PR"}) or numeric FIPS codes (e.x. \code{72}). ZCTAs that are
+within the given territories will be returned. By default, all territories
+are included.}
 
 \item{cb}{A logical scalar; if \code{FALSE}, the most detailed TIGER/Line
     data will be used for \code{style = "zcta5"}. If \code{TRUE}, a

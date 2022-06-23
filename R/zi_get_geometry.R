@@ -8,9 +8,9 @@
 #'     specific counties).
 #'
 #' @usage zi_get_geometry (year, style = "zcta5", return = "id", class = "sf",
-#'     state = NULL, county = NULL, cb = FALSE, starts_with = NULL,
-#'     includes = NULL, excludes = NULL, method, shift_geo = FALSE,
-#'     debug = NULL)
+#'     state = NULL, county = NULL, territory = c("AS", "GU", "MP", "PR", "VI"),
+#'     cb = FALSE, starts_with = NULL, includes = NULL, excludes = NULL, method,
+#'     shift_geo = FALSE, debug = NULL)
 #'
 #' @param year A four-digit numeric scalar for year. \code{zippeR} currently
 #'     supports data between 2010 and 2021.
@@ -24,7 +24,7 @@
 #' @param class A character scalar; if \code{"sf"} (default), a \code{sf} object
 #'     suitable for mapping will be returned. If \code{"tibble"}, an object
 #'     that omits the geometric data will be returned instead.
-#' @param state A scalar or vector with character state abbreviations
+#' @param state A character scalar or vector with character state abbreviations
 #'     (e.x. \code{"MO"}) or numeric FIPS codes (e.x. \code{29}). ZCTAs that
 #'     are within the given states (determined based on a combination of
 #'     \code{year} and \code{method}) will be returned. See Details below for
@@ -34,6 +34,10 @@
 #'     \code{"29510"}). ZCTAs that are within the given states (determined based
 #'     on a combination of \code{year} and \code{method}) will be returned. See
 #'     Details below for more information. This argument is optional.
+#' @param territory A character scalar or vector with character territory abbreviations
+#'     (e.x. \code{"PR"}) or numeric FIPS codes (e.x. \code{72}). ZCTAs that are
+#'     within the given territories will be returned. By default, all territories
+#'     are included.
 #' @param cb A logical scalar; if \code{FALSE}, the most detailed TIGER/Line
 #'     data will be used for \code{style = "zcta5"}. If \code{TRUE}, a
 #'     generalized (1:500k) version of the data will be used. The generalized
@@ -100,7 +104,8 @@
 #'
 #' @export
 zi_get_geometry <- function(year, style = "zcta5", return = "id", class = "sf",
-                            state = NULL, county = NULL, cb = FALSE,
+                            state = NULL, county = NULL,
+                            territory = c("AS", "GU", "MP", "PR", "VI"), cb = FALSE,
                             starts_with = NULL, includes = NULL, excludes = NULL,
                             method, shift_geo = FALSE, debug = NULL){
 
@@ -141,6 +146,10 @@ zi_get_geometry <- function(year, style = "zcta5", return = "id", class = "sf",
     state <- unlist(sapply(state, validate_state, USE.NAMES=FALSE))
   }
 
+  if (any(state %in% c("AS", "GU", "MP", "PR", "VI")) == TRUE){
+    stop("Please specify territories using the 'territory' argument instead. Valid territories are: 'AS', 'GU', 'MP', 'PR', or 'VI' (or their equivalent FIPS codes).")
+  }
+
   if (is.null(county) == FALSE & is.null(state) == TRUE){
     stop("Please provide at least one state abbreviation or FIPS code for the 'state' argument that corresponds to data passed to the 'county' argument.")
   }
@@ -156,6 +165,12 @@ zi_get_geometry <- function(year, style = "zcta5", return = "id", class = "sf",
   }
 
   ## validate counties
+
+  if (is.null(territory) == FALSE){
+    if (any(territory %in% c("AS", "GU", "MP", "PR", "VI")) == FALSE){
+      stop("An abbreviation given for the 'territory' argument is invalid. Please use one or more of: 'AS', 'GU', 'MP', 'PR', or 'VI' (or their equivalent FIPS codes).")
+    }
+  }
 
   if (is.null(starts_with) == FALSE){
     valid <- zi_validate_starts(starts_with)
@@ -186,6 +201,7 @@ zi_get_geometry <- function(year, style = "zcta5", return = "id", class = "sf",
     year <- 2010
   }
 
+  # set debugging
   if (is.null(debug)){
     debug <- "live"
   }
@@ -194,14 +210,16 @@ zi_get_geometry <- function(year, style = "zcta5", return = "id", class = "sf",
   if (style == "zcta5"){
 
     out <- zi_get_zcta5(year = year, return = return, state = state,
-                        county = county, cb = cb, starts_with = starts_with,
+                        county = county, territory = territory, cb = cb,
+                        starts_with = starts_with,
                         includes = includes, excludes = excludes,
                         method = method, debug = debug)
 
   } else if (style == "zcta3"){
 
     out <- zi_get_zcta3(year = year, state = state,
-                        county = county, cb = cb, starts_with = starts_with,
+                        county = county, territory = territory, cb = cb,
+                        starts_with = starts_with,
                         includes = includes, excludes = excludes,
                         method = method, debug = debug)
 
@@ -231,8 +249,8 @@ zi_get_geometry <- function(year, style = "zcta5", return = "id", class = "sf",
 }
 
 ## Sub Function for ZCTA5
-zi_get_zcta5 <- function(year, return = "id", state, county, cb, starts_with,
-                         includes, excludes, method, debug){
+zi_get_zcta5 <- function(year, return = "id", state, county, territory, cb,
+                         starts_with, includes, excludes, method, debug){
 
   # global variables
   GEOID10 = GEOID20 = GEOID = NULL
@@ -248,7 +266,7 @@ zi_get_zcta5 <- function(year, return = "id", state, county, cb, starts_with,
   if (is.null(state) == FALSE & is.null(county) == TRUE) {
 
     ## generate vector of requested state ZCTAs
-    zcta_vec <- zi_list_zctas(year = year, state = state, method = method)
+    zcta_vec <- zi_list_zctas(year = year, state = c(state, territory), method = method)
 
     ## add inclusions, remove exclusions
     zcta_vec <- unique(c(zcta_vec, includes))
@@ -267,7 +285,7 @@ zi_get_zcta5 <- function(year, return = "id", state, county, cb, starts_with,
   } else if (is.null(state) == FALSE & is.null(county) == FALSE){
 
     ## geoprocess based on county to produced vector of ZTAs
-    zcta_vec <- zi_process_county(cb = cb, state = state, county = county,
+    zcta_vec <- zi_process_county(cb = cb, state = c(state, territory), county = county,
                                   year = year, zcta = out, method = method,
                                   style = "zcta5", debug = debug)
 
@@ -294,10 +312,39 @@ zi_get_zcta5 <- function(year, return = "id", state, county, cb, starts_with,
       out <- dplyr::rename(out, GEOID = GEOID20)
     }
 
+    ## manage territories
+    if (is.null(territory) == TRUE){
+
+      ## all territories not including American Samoa
+      out <- dplyr::filter(out, substr(GEOID, 1,3) %in% c("006", "007", "008", "009", "969") == FALSE)
+
+      ## American Samoa
+      out <- dplyr::filter(out, GEOID != "96799")
+
+    } else if (is.null(territory) == FALSE){
+
+      ## territory vector
+      territory_vec <- c("AS", "GU", "MP", "PR", "VI")
+
+      if (all(territory == territory_vec) == FALSE){
+
+        ## construct list
+        territory_vec <- territory_vec[territory_vec %in% territory == FALSE]
+
+        ## create vector
+        zcta_vec <- zi_list_zctas(year = 2019, state = territory_vec, method = "intersect")
+
+        ## append to excludes
+        excludes <- unique(sort(c(excludes, zcta_vec)))
+
+      }
+    }
+
     ## subset
     if (is.null(excludes) == FALSE){
-      out <- dplyr::filter(out, GEOID %in% zcta_vec == TRUE)
+      out <- dplyr::filter(out, GEOID %in% excludes == FALSE)
     }
+
   }
 
   # subset based on starts with
@@ -372,7 +419,7 @@ zi_process_county <- function(cb, state, county, year, zcta, method, style, debu
 }
 
 ## Sub Function for ZCTA3
-zi_get_zcta3 <- function(year, state, county, cb, starts_with,
+zi_get_zcta3 <- function(year, state, county, territory, cb, starts_with,
                          includes, excludes, method, debug){
 
   # global variables
@@ -392,7 +439,7 @@ zi_get_zcta3 <- function(year, state, county, cb, starts_with,
   if (is.null(state) == FALSE & is.null(county) == TRUE) {
 
     ## generate vector of requested state ZCTAs
-    zcta_vec <- zi_list_zctas(year = year, state = state, method = method)
+    zcta_vec <- zi_list_zctas(year = year, state = c(state, territory), method = method)
     zcta_vec <- unique(substr(zcta_vec, 1, 3))
 
     ## add inclusions, remove exclusions
@@ -409,7 +456,7 @@ zi_get_zcta3 <- function(year, state, county, cb, starts_with,
   } else if (is.null(state) == FALSE & is.null(county) == FALSE){
 
     ## geoprocess based on county to produced vector of ZTAs
-    zcta_vec <- zi_process_county(cb = cb, state = state, county = county,
+    zcta_vec <- zi_process_county(cb = cb, state = c(state, territory), county = county,
                                   year = year, zcta = out, method = method,
                                   style = "zcta3", debug = debug)
 
@@ -421,6 +468,46 @@ zi_get_zcta3 <- function(year, state, county, cb, starts_with,
     out <- dplyr::filter(out, ZCTA3 %in% zcta_vec == TRUE)
 
   } else if (is.null(state) == TRUE & is.null(county) == TRUE){
+
+    ## manage territories
+    if (is.null(territory) == TRUE){
+
+      ## all territories not including American Samoa
+      out <- dplyr::filter(out, ZCTA3 %in% c("006", "007", "008", "009", "969") == FALSE)
+
+      ## American Samoa
+      out <- sf::st_difference(out, samoa_bounding_box)
+
+    } else if (is.null(territory) == FALSE){
+
+      ## territory vector
+      territory_vec <- c("AS", "GU", "MP", "PR", "VI")
+
+      if (all(territory == territory_vec) == FALSE){
+
+        ## construct vector
+        territory_vec <- territory_vec[territory_vec %in% territory == FALSE]
+
+        ## remove American Samoa from vector list
+        if ("AS" %in% territory_vec == TRUE){
+
+          ## revise vector
+          territory_vec <- territory_vec[territory_vec %in% c("AS") == FALSE]
+
+          ## geoprocess
+          out <- sf::st_difference(out, samoa_bounding_box)
+
+        }
+
+        ## create vector
+        zcta_vec <- zi_list_zctas(year = 2019, state = territory_vec, method = "intersect")
+        zcta_vec <- unique(substr(zcta_vec, 1, 3))
+
+        ## append to excludes
+        excludes <- unique(sort(c(excludes, zcta_vec)))
+
+      }
+    }
 
     ## remove exclusions
     if (is.null(excludes) == FALSE){
@@ -477,4 +564,3 @@ zi_validate_starts <- function(x){
   return(out)
 
 }
-

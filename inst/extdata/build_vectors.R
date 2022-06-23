@@ -365,6 +365,7 @@ changes2021 <- id_changes(year1 = zcta2020, year2 = zcta2021,
 changes <- c(zcta2010, changes2012, changes2013, changes2014, changes2015,
              changes2016, changes2017, changes2018, changes2019, changes2020,
              changes2021)
+changes <- c(changes, AS12 = "96799")
 changes <- changes[order(names(changes))]
 
 ### clean-up
@@ -422,9 +423,14 @@ zcta3_url <- list(
   zcta3_2021 = "https://raw.githubusercontent.com/chris-prener/zcta3/main/data/zcta3_2021.geojson"
 )
 
+# Create American Samoa Bounding Box ####
+samoa_bounding_box <- zctas(cb = TRUE, year = 2019)
+samoa_bounding_box <- filter(samoa_bounding_box, GEOID10 == "96799")
+samoa_bounding_box <- st_as_sfc(st_bbox(samoa_bounding_box))
+
 # Create Output ####
 save(changes_intersects, changes_centroids, reference_intersects,
-     reference_centroids, states_lookup, zcta3_url,
+     reference_centroids, states_lookup, samoa_bounding_box, zcta3_url,
      file = "R/sysdata.rda", version = 2, compress = "xz")
 
 
