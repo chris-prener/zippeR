@@ -121,10 +121,6 @@ zi_get_geometry <- function(year, style = "zcta5", return = "id", class = "sf",
     stop("The 'return' value provided is invalid. Please select either 'id' or 'full'.")
   }
 
-  if (style == "zcta3" & year %in% c(2010, 2011, 2012, 2020, 2021) == FALSE){
-    stop(paste0("ZCTA3 data for ", year, " are not yet available."))
-  }
-
   if (style == "zcta3" & return == "full"){
     warning("The 'full' option for 'return' is not available for 'zcta3' data. Please use 'id' instead.")
   }
